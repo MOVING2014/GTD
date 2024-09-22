@@ -1,14 +1,21 @@
 import { TaskModel } from '../models/IModels';
 import { GTDController } from '../viewmodel/GTDController';
 import {  TaskList } from '../components/TaskItem'
+import { EditTaskComponent } from '../components/EditTask';
+import promptAction from '@ohos.promptAction';
+import hilog from '@ohos.hilog';
 
 @Entry
 @Component
 struct Index {
   @Provide gtdController: GTDController = new GTDController();
+  @Provide currentEditingTask: TaskModel |null = null;
+
   private tabsController: TabsController = new TabsController();
   @State currentIndex: number = 0;
   @State tasks: TaskModel[] = [];
+  @State isPopupVisible: boolean = false;
+  @State popupTranslateY: number = 100;
 
 
   aboutToAppear() {
@@ -18,10 +25,34 @@ struct Index {
   async loadTasks() {
     try {
       this.tasks = await this.gtdController.getAllTasks();
+      hilog.debug(0x001,'tasksload',`tasksload:  ${JSON.stringify(this.tasks)}`)
+
+
     } catch (error) {
       console.error('Failed to load tasks:', error);
     }
     this.gtdController.initializeCache()
+  }
+
+
+
+  showPopup() {
+    this.isPopupVisible = true;
+    animateTo({ duration: 200 }, () => {
+      // this.popupOpacity = 1;
+      this.popupTranslateY = 0;
+    });
+  }
+
+  hidePopup() {
+    animateTo({ duration: 200,
+      onFinish: () => {
+        this.isPopupVisible = false;
+      }
+
+    }, () => {
+      this.popupTranslateY = 350;
+    });
   }
 
   @Builder TabBuilder(title: string, index: number, emoji: string) {
@@ -48,7 +79,9 @@ struct Index {
               .fontWeight(FontWeight.Bold)
               .padding({ top: 20, bottom: 10 })
 
-            TaskList()
+            TaskList({
+              tasks:$tasks
+            })
 
 
           }
@@ -57,20 +90,56 @@ struct Index {
           .height('100%')
           .alignItems(HorizontalAlign.Start) // 添加这一行
 
-          Button({ type: ButtonType.Capsule, stateEffect: true }) {
-            Text("+")
-              .fontColor(Color.White)
-              .fontWeight(FontWeight.Bold)
-              .fontSize(30)
-              // .width('100%')
-              .textAlign(TextAlign.Center)
-          }
-          .width(60)
-          .height(36)
-          .margin({ bottom: 30, right: 20 })
-          .onClick(() => {
 
-          })
+          if (this.isPopupVisible) {
+            Column()
+              .width('100%')
+              .height('100%')
+              .backgroundColor('#000000')
+              .opacity(0.5)
+              .onAppear(() => this.showPopup())
+
+            EditTaskComponent({
+
+              onConfirm: async (record: TaskModel) => {
+                // if (isUpdate) {
+                //   await this.gtdController.updateTask(record);
+                //   promptAction.showToast({ message: '更新成功', duration: 2000 });
+                // // } else {
+                //   await this.gtdController.createTask(record);
+                //   promptAction.showToast({ message: '添加成功', duration: 2000 });
+                // // }
+
+                await this.gtdController.createTask(record);
+                this.loadTasks();
+                // hilog.debug(0x001,'index',`${JSON.stringify(this.tasks)}`)
+                this.hidePopup();
+                hilog.debug(0x001,'tasksload',`tasksload:  ${JSON.stringify(this.tasks)}`)
+
+              },
+              onCancel: () => {
+                this.hidePopup();
+              }
+            })
+              .translate({ y: this.popupTranslateY })
+          }
+
+          if (!this.isPopupVisible) {
+            Button({ type: ButtonType.Capsule, stateEffect: true }) {
+              Text("+")
+                .fontColor(Color.White)
+                .fontWeight(FontWeight.Bold)
+                .fontSize(30)
+                .textAlign(TextAlign.Center)
+            }
+            .width(60)
+            .height(36)
+            .margin({ bottom: 30, right: 20 })
+            .onClick(() => {
+              this.showPopup()
+              // this.currentEditingTask = null;
+            })
+          }
 
         }
       }

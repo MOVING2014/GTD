@@ -1,10 +1,11 @@
 import hilog from '@ohos.hilog';
+import { formatDateToChinese, overDue } from '../common/utils';
 import { ProjectModel, TaskModel } from '../models/IModels';
 import { GTDController } from '../viewmodel/GTDController';
 
 @Component
 export struct TaskList {
-  @State tasks: TaskModel[]|null = null;
+  @Link tasks: TaskModel[];
   @State projects: ProjectModel[]|null = null;
   @Consume gtdController: GTDController;
 
@@ -89,9 +90,10 @@ aboutToAppear(){
                 }
 
                 if (task.dueDate) {
-                  Text(new Date(task.dueDate).toLocaleDateString())
+
+                  Text(formatDateToChinese(task.dueDate, false))
                     .fontSize(16)
-                    .fontColor('#888888')
+                    .fontColor(overDue(task.dueDate)? '#FF0000' : '#888888')
                     .margin({ top: 5 }) // 为日期添加一些顶部边距
                 }
 

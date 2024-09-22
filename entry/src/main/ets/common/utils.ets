@@ -69,12 +69,15 @@ export function getMoodColor(level: number): string {
 }
 
 
-export  function formatDateToChinese(date: Date): string {
+export  function formatDateToChinese(date: Date, withYear: boolean = true ): string {
   const year = date.getFullYear();
   const month = date.getMonth() + 1; // getMonth() 返回 0-11
   const day = date.getDate();
-
-  return `${year}年${month.toString()}月${day.toString()}日`;
+  if(withYear) {
+    return `${year}年${month.toString()}月${day.toString()}日`;
+  }else{
+    return `${month.toString()}月${day.toString()}日`;
+  }
 }
 
 export  function  parseDate(dateString: string): Date {
@@ -82,3 +85,10 @@ export  function  parseDate(dateString: string): Date {
   return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
 }
 
+
+export function overDue(dueDate: Date): boolean {
+  let today = new Date();
+  today.setHours(0, 0, 0, 0); // 设置时间为当天的开始
+  let isPastDue = dueDate.getTime() < today.getTime();
+  return isPastDue
+}

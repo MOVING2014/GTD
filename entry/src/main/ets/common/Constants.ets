@@ -51,7 +51,7 @@ export class Constants {
     offsetY: number
   } = {
     radius: 4,
-    color: Styles.boarderColorSecondary,
+    color: Constants.boarderColorSecondary,
     offsetX: 1,
     offsetY: 1
   };
@@ -63,7 +63,7 @@ export class Constants {
     offsetY: number
   } = {
     radius: 8,
-    color: Styles.boarderColorPrimary,
+    color: Constants.boarderColorPrimary,
     offsetX: 2,
     offsetY: 2
   };
