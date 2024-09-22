@@ -4,12 +4,13 @@ export interface TaskModel {
   description?: string;
   createdDate: Date;
   dueDate?: Date;
-  priority?: 'Low' | 'Medium' | 'High';
+  priority?: 'Low' | 'Medium' | 'High'|'None';
   isCompleted: boolean;
   projectId?: number;
   contextId?: number;
   flagged?: boolean;
   reminder?: ReminderModel;
+  modifyTime?: Date;
 }
 
 export interface ProjectModel {

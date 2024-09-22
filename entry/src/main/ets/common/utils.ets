@@ -81,8 +81,14 @@ export  function formatDateToChinese(date: Date, withYear: boolean = true ): str
 }
 
 export  function  parseDate(dateString: string): Date {
-  let parts = dateString.match(/(\d+)/g);
-  return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+
+  if (!dateString || dateString.trim() === '') {
+    return null; // 返回 null 表示无效日期
+  }
+
+    let parts = dateString.match(/(\d+)/g);
+    return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  
 }
 
 

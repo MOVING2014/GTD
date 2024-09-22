@@ -1,7 +1,7 @@
 import { TaskModel } from '../models/IModels';
 import { GTDController } from '../viewmodel/GTDController';
 import {  TaskList } from '../components/TaskItem'
-import { EditTaskComponent } from '../components/EditTask';
+import { AddTaskComponent } from '../components/AddTask';
 import promptAction from '@ohos.promptAction';
 import hilog from '@ohos.hilog';
 
@@ -51,7 +51,7 @@ struct Index {
       }
 
     }, () => {
-      this.popupTranslateY = 350;
+      this.popupTranslateY = 400;
     });
   }
 
@@ -95,11 +95,11 @@ struct Index {
             Column()
               .width('100%')
               .height('100%')
-              .backgroundColor('#000000')
-              .opacity(0.5)
+              .backgroundColor('#1a000000')
               .onAppear(() => this.showPopup())
+              .onClick(() => this.hidePopup())
 
-            EditTaskComponent({
+            AddTaskComponent({
 
               onConfirm: async (record: TaskModel) => {
                 // if (isUpdate) {
