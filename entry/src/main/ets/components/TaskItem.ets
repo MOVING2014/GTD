@@ -116,6 +116,7 @@ aboutToAppear(){
                 Text(task.title)
                   .fontSize(18)
                   .fontColor(task.isCompleted ? '#888888' : '#000000')
+                  .fontWeight(FontWeight.Bold)
                   .decoration({ type: task.isCompleted ? TextDecorationType.LineThrough : TextDecorationType.None })
                     // .fontColor(this.tasks[index].isCompleted ? '#888888' : '#000000')
                     // .decoration({ type: this.tasks[index].isCompleted ? TextDecorationType.LineThrough : TextDecorationType.None })

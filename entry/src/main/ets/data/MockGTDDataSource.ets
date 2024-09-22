@@ -33,10 +33,23 @@ export  class MockGTDDataSource implements GTDDataSource {
   private projects: ProjectModel[] = [
     {
       id: 1,
-      name: "工作项目",
+      name: "X项目流程",
       description: "与工作相关的所有任务",
       taskIds: [1]
+    },
+    {
+      id: 2,
+      name: "网球",
+      description: "与工作相关的所有任务",
+      taskIds: [2]
+    },
+    {
+      id: 3,
+      name: "GTD APP",
+      description: "与工作相关的所有任务",
+      taskIds: []
     }
+
   ];
 
   private contexts: ContextModel[] = [

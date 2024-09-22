@@ -1,8 +1,9 @@
 // AddTaskComponent.ets
-import { ReminderModel, TaskModel } from '../models/IModels';
+import { ContextModel, ProjectModel, ReminderModel, TaskModel } from '../models/IModels';
 import { formatDateToChinese, parseDate } from '../common/utils';
 import { Constants } from '../common/Constants';
 import hilog from '@ohos.hilog';
+import { GTDController } from '../viewmodel/GTDController';
 
 @Component
 export struct AddTaskComponent {
@@ -16,7 +17,13 @@ export struct AddTaskComponent {
   @State flagged: boolean = false;
   @State reminder: ReminderModel | undefined = undefined;
   @Consume currentEditingTask: TaskModel;
+  @Consume  gtdController: GTDController;
   @State dueDateString: string = ''
+
+  @State selectedContext: ContextModel|null = null;
+  @State selectedProject: ProjectModel|null = null;
+  @State contexts: string[] = ['工作', '家庭', '学习', '娱乐'] // 这里可以根据实际情况从数据源获取
+
   // formatDateToChinese(new Date());
 
 
@@ -84,7 +91,7 @@ export struct AddTaskComponent {
     Column() {
       Button({ type: ButtonType.Normal, stateEffect: true }) {
         Row() {
-          Text('场景')
+          Text(this.selectedContext ? this.selectedContext.name : '场景')
             .fontSize(16)
             .fontColor(Color.Gray)
         }
@@ -93,11 +100,29 @@ export struct AddTaskComponent {
       .height(30)
       .backgroundColor(Color.Black)
       .borderRadius(5)
-      .onClick(
-        () => {}
-      )
+      .bindMenu(this.contextMenuBuilder)
+
     }
     .margin({right:5})
+  }
+
+  @Builder contextMenuBuilder() {
+    Menu() {
+      MenuItem({ content: '无场景' })
+        .onClick(() => {
+          this.selectedContext = null
+          // 这里可以添加清除选择后的逻辑
+        })
+
+      ForEach(Object.values(this.gtdController.contextCache), (context: ContextModel) => {
+        MenuItem({ content: context.name })
+          .onClick(() => {
+            this.selectedContext = context
+            // 这里可以添加选择 context 后的逻辑，比如更新任务的 context
+          })
+
+      })
+    }
   }
 
   @Builder ProjectSelector(){
@@ -110,6 +135,7 @@ export struct AddTaskComponent {
         }
         .padding({ left:8, right: 8 })
       }
+      .bindMenu(this.ProjectMenuBuilder)
       .height(30)
       .backgroundColor(Color.Black)
       .borderRadius(5)
@@ -119,6 +145,48 @@ export struct AddTaskComponent {
     }
     .margin({right:5})
   }
+
+
+  @Builder ProjectMenuBuilder() {
+    Menu() {
+
+      // Column(){
+      //   Row(){
+      //     Text("无项目")
+      //       .onClick(()=>{this.selectedProject = null})
+      //
+      //   }
+      //   ForEach(Object.values(this.gtdController.projectCache), (project: ProjectModel) => {
+      //     Row(){
+      //       Text(project.name)
+      //           .onClick(() => {
+      //             this.selectedProject = project
+      //             // 这里可以添加选择 context 后的逻辑，比如更新任务的 context
+      //           })
+      //     }
+      //
+      //   })
+      //
+      //
+      // }
+      MenuItem({ content: '无项目' })
+        .onClick(() => {
+          this.selectedProject = null
+          // 这里可以添加清除选择后的逻辑
+        })
+
+      ForEach(Object.values(this.gtdController.projectCache), (project: ProjectModel) => {
+        MenuItem({ content: project.name })
+          .onClick(() => {
+            this.selectedProject = project
+            // 这里可以添加选择 context 后的逻辑，比如更新任务的 context
+          })
+
+      })
+    }
+  }
+
+
 
   @Builder Sender(){
     Column() {
@@ -142,8 +210,8 @@ export struct AddTaskComponent {
           isCompleted: this.isCompleted,
           priority: this.priority,
           createdDate: new Date(), // 为新任务设置创建日期
-          projectId: this.projectId,
-          contextId: this.contextId,
+          projectId: this.selectedProject?.id,
+          contextId: this.selectedContext?.id,
           flagged: this.flagged,
           reminder: this.reminder,
           modifyTime: new Date()
