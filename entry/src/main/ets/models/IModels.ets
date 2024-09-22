@@ -6,8 +6,8 @@ export interface TaskModel {
   dueDate?: Date;
   priority?: 'Low' | 'Medium' | 'High';
   isCompleted: boolean;
-  projectId?: string;
-  contextId?: string;
+  projectId?: number;
+  contextId?: number;
   flagged?: boolean;
   reminder?: ReminderModel;
 }
@@ -16,7 +16,7 @@ export interface ProjectModel {
   id: number;
   name: string;
   description?: string;
-  taskIds?: string[];
+  taskIds?: number[];
 }
 
 export interface ContextModel {
@@ -28,7 +28,7 @@ export interface ContextModel {
 
 
 export interface ReminderModel {
-  id: string;
+  id: number;
   time: Date;
   repeatRule?: 'None' | 'Daily' | 'Weekly' | 'Monthly';
 }

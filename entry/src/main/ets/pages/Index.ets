@@ -21,6 +21,7 @@ struct Index {
     } catch (error) {
       console.error('Failed to load tasks:', error);
     }
+    this.gtdController.initializeCache()
   }
 
   @Builder TabBuilder(title: string, index: number, emoji: string) {
@@ -39,17 +40,39 @@ struct Index {
   build() {
     Tabs({ barPosition: BarPosition.End, controller: this.tabsController }) {
       TabContent() {
-        Column() {
-          Text("收件箱")
-            .fontSize(24)
-            .fontWeight(FontWeight.Bold)
-            .padding({ top: 20, bottom: 20 })
 
-          TaskList()
+        Stack({ alignContent: Alignment.Bottom }) {
+          Column() {
+            Text("收件箱")
+              .fontSize(24)
+              .fontWeight(FontWeight.Bold)
+              .padding({ top: 20, bottom: 10 })
 
+            TaskList()
+
+
+          }
+          .width('95%')
+          .layoutWeight(1)
+          .height('100%')
+          .alignItems(HorizontalAlign.Start) // 添加这一行
+
+          Button({ type: ButtonType.Capsule, stateEffect: true }) {
+            Text("+")
+              .fontColor(Color.White)
+              .fontWeight(FontWeight.Bold)
+              .fontSize(30)
+              // .width('100%')
+              .textAlign(TextAlign.Center)
+          }
+          .width(60)
+          .height(36)
+          .margin({ bottom: 30, right: 20 })
+          .onClick(() => {
+
+          })
 
         }
-        .width('100%')
       }
       .tabBar(this.TabBuilder("收件箱", 0, "📥"))
 

@@ -5,6 +5,47 @@ import { MockGTDDataSource } from '../data/MockGTDDataSource';
 export class GTDController {
   private dataSource: GTDDataSource;
 
+  projectCache: Record<number, ProjectModel | null> = {};
+  contextCache: Record<number, ContextModel | null> = {};
+  reminderCache: Record<number, ReminderModel |null> = {};
+
+  async initializeCache(): Promise<void> {
+    try {
+      const projects = await this.getAllProjects();
+      projects.forEach(project => {
+        this.projectCache[project.id] = project;
+      });
+
+      const contexts = await this.getAllContexts();
+      contexts.forEach(context => {
+        this.contextCache[context.id] = context;
+      });
+
+      const reminders = await this.getAllReminders();
+      reminders.forEach(reminder => {
+        this.reminderCache[reminder.id] = reminder;
+      });
+
+      console.log(' initialized successfully');
+    } catch (error) {
+      console.error('Error initializing :', error);
+    }
+  }
+  // 修改 getProjectById 方法以使用缓存
+  async getProjectById(id: number): Promise<ProjectModel | null> {
+    if (this.projectCache[id] === undefined) {
+      try {
+        const project = await this.dataSource.getProjectById(id);
+        this.projectCache[id] = project;
+      } catch (error) {
+        console.error(`Error fetching project with id ${id}:`, error);
+        this.projectCache[id] = null;
+      }
+    }
+    return this.projectCache[id];
+  }
+
+
   constructor(dataSource: GTDDataSource = new MockGTDDataSource()) {
     this.dataSource = dataSource;
   }
@@ -12,6 +53,10 @@ export class GTDController {
   // Task methods
   async getAllTasks(): Promise<TaskModel[]> {
     return this.dataSource.getTasks();
+  }
+
+  async getTaskById(id: number): Promise<TaskModel> {
+    return this.dataSource.getTaskById(id)
   }
 
   async createTask(task: Omit<TaskModel, 'id'>): Promise<TaskModel> {
@@ -27,12 +72,14 @@ export class GTDController {
     return this.dataSource.deleteTask(taskId);
   }
 
-  async getTasksByProject(projectId: string): Promise<TaskModel[]> {
+  async getTasksByProject(projectId: number): Promise<TaskModel[]> {
     const tasks = await this.dataSource.getTasks();
     return tasks.filter(task => task.projectId === projectId);
   }
 
-  async getTasksByContext(contextId: string): Promise<TaskModel[]> {
+
+
+  async getTasksByContext(contextId: number): Promise<TaskModel[]> {
     const tasks = await this.dataSource.getTasks();
     return tasks.filter(task => task.contextId === contextId);
   }
@@ -41,6 +88,11 @@ export class GTDController {
   async getAllProjects(): Promise<ProjectModel[]> {
     return this.dataSource.getProjects();
   }
+
+  // async getProjectById(id: number): Promise<ProjectModel> {
+  //   return await this.dataSource.getProjectById(id)
+  // }
+  //
 
   async createProject(project: Omit<ProjectModel, 'id'>): Promise<ProjectModel> {
     const newProject: ProjectModel = { ...project, id: 0 };
@@ -60,6 +112,10 @@ export class GTDController {
     return this.dataSource.getContexts();
   }
 
+  async getContextById(id: number): Promise<ContextModel> {
+    return this.dataSource.getContextById(id)
+  }
+
   async createContext(context: Omit<ContextModel, 'id'>): Promise<ContextModel> {
     const newContext: ContextModel = { ...context, id: 0 };
     return this.dataSource.addContext(newContext);
@@ -77,7 +133,9 @@ export class GTDController {
   async getAllReminders(): Promise<ReminderModel[]> {
     return this.dataSource.getReminders();
   }
-
+  async getReminderById(id: number): Promise<ReminderModel> {
+    return this.dataSource.getReminderById(id)
+  }
   async createReminder(reminder: ReminderModel): Promise<ReminderModel> {
     return this.dataSource.addReminder(reminder);
   }
@@ -86,7 +144,7 @@ export class GTDController {
     return this.dataSource.updateReminder(reminder);
   }
 
-  async deleteReminder(reminderId: string): Promise<boolean> {
+  async deleteReminder(reminderId: number): Promise<boolean> {
     return this.dataSource.deleteReminder(reminderId);
   }
 

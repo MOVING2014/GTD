@@ -11,11 +11,11 @@ export  class MockGTDDataSource implements GTDDataSource {
       dueDate: new Date("2023-05-07"),
       priority: "High",
       isCompleted: false,
-      projectId: "1",
-      contextId: "1",
+      projectId: 1,
+      contextId: 1,
       flagged: true,
       reminder: {
-        id: "1",
+        id: 1,
         time: new Date("2023-05-06T09:00:00"),
         repeatRule: "None"
       }
@@ -23,9 +23,10 @@ export  class MockGTDDataSource implements GTDDataSource {
     {
       id: 2,
       title: "购买日用品",
+      projectId:2,
       createdDate: new Date("2023-05-02"),
       isCompleted: false,
-      contextId: "2"
+      contextId: 2
     }
   ];
 
@@ -34,26 +35,26 @@ export  class MockGTDDataSource implements GTDDataSource {
       id: 1,
       name: "工作项目",
       description: "与工作相关的所有任务",
-      taskIds: ["1"]
+      taskIds: [1]
     }
   ];
 
   private contexts: ContextModel[] = [
     {
       id: 1,
-      name: "办公室",
+      name: "💼办公室",
       description: "在办公室可以完成的任务"
     },
     {
       id: 2,
-      name: "家",
+      name: "🏠家",
       description: "在家可以完成的任务"
     }
   ];
 
   private reminders: ReminderModel[] = [
     {
-      id: "1",
+      id: 1,
       time: new Date("2023-05-06T09:00:00"),
       repeatRule: "None"
     }
@@ -62,6 +63,11 @@ export  class MockGTDDataSource implements GTDDataSource {
   // Task methods
   async getTasks(): Promise<TaskModel[]> {
     return Promise.resolve(this.tasks);
+  }
+
+  async getTaskById(taskId: number): Promise<TaskModel | null> {
+    const task = this.tasks.find(t => t.id === taskId);
+    return Promise.resolve(task || null);
   }
 
   async addTask(task: TaskModel): Promise<TaskModel> {
@@ -93,6 +99,11 @@ export  class MockGTDDataSource implements GTDDataSource {
     return Promise.resolve(this.projects);
   }
 
+  async getProjectById(projectId: number): Promise<ProjectModel | null> {
+    const project = this.projects.find(p => p.id === projectId);
+    return Promise.resolve(project || null);
+  }
+
   async addProject(project: ProjectModel): Promise<ProjectModel> {
     project.id = this.projects.length + 1;
     this.projects.push(project);
@@ -121,6 +132,12 @@ export  class MockGTDDataSource implements GTDDataSource {
   async getContexts(): Promise<ContextModel[]> {
     return Promise.resolve(this.contexts);
   }
+  async getContextById(contextId: number): Promise<ContextModel | null> {
+    const context = this.contexts.find(c => c.id === contextId);
+    return Promise.resolve(context || null);
+  }
+
+
 
   async addContext(context: ContextModel): Promise<ContextModel> {
     context.id = this.contexts.length + 1;
@@ -150,7 +167,10 @@ export  class MockGTDDataSource implements GTDDataSource {
   async getReminders(): Promise<ReminderModel[]> {
     return Promise.resolve(this.reminders);
   }
-
+  async getReminderById(reminderId: number): Promise<ReminderModel | null> {
+    const reminder = this.reminders.find(r => r.id === reminderId);
+    return Promise.resolve(reminder || null);
+  }
   async addReminder(reminder: ReminderModel): Promise<ReminderModel> {
     this.reminders.push(reminder);
     return Promise.resolve(reminder);
@@ -165,7 +185,7 @@ export  class MockGTDDataSource implements GTDDataSource {
     return Promise.reject(new Error("Reminder not found"));
   }
 
-  async deleteReminder(reminderId: string): Promise<boolean> {
+  async deleteReminder(reminderId: number): Promise<boolean> {
     const index = this.reminders.findIndex(r => r.id === reminderId);
     if (index !== -1) {
       this.reminders.splice(index, 1);

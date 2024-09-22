@@ -2,6 +2,7 @@ import { TaskModel, ProjectModel, ContextModel, ReminderModel } from '../models/
 
 export interface TaskDataSource {
   getTasks(): Promise<TaskModel[]>;
+  getTaskById(taskId: number): Promise<TaskModel | null>;
   addTask(task: TaskModel): Promise<TaskModel>;
   updateTask(task: TaskModel): Promise<TaskModel>;
   deleteTask(taskId: number): Promise<boolean>;
@@ -9,6 +10,7 @@ export interface TaskDataSource {
 
 export interface ProjectDataSource {
   getProjects(): Promise<ProjectModel[]>;
+  getProjectById(projectId: number): Promise<ProjectModel | null>;
   addProject(project: ProjectModel): Promise<ProjectModel>;
   updateProject(project: ProjectModel): Promise<ProjectModel>;
   deleteProject(projectId: number): Promise<boolean>;
@@ -17,15 +19,17 @@ export interface ProjectDataSource {
 export interface ContextDataSource {
   getContexts(): Promise<ContextModel[]>;
   addContext(context: ContextModel): Promise<ContextModel>;
+  getContextById(contextId: number): Promise<ContextModel | null>;
   updateContext(context: ContextModel): Promise<ContextModel>;
   deleteContext(contextId: number): Promise<boolean>;
 }
 
 export interface ReminderDataSource {
   getReminders(): Promise<ReminderModel[]>;
+  getReminderById(reminderId: number): Promise<ReminderModel | null>;
   addReminder(reminder: ReminderModel): Promise<ReminderModel>;
   updateReminder(reminder: ReminderModel): Promise<ReminderModel>;
-  deleteReminder(reminderId: string): Promise<boolean>;
+  deleteReminder(reminderId: number): Promise<boolean>;
 }
 
 // 如果需要，可以创建一个聚合接口
