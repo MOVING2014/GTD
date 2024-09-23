@@ -8,6 +8,21 @@ export class GTDController {
   projectCache: Record<number, ProjectModel | null> = {};
   contextCache: Record<number, ContextModel | null> = {};
   reminderCache: Record<number, ReminderModel |null> = {};
+  private observers: Set<() => void> = new Set();
+
+
+  addObserver(observer: () => void) {
+    this.observers.add(observer);
+  }
+
+  removeObserver(observer: () => void) {
+    this.observers.delete(observer);
+  }
+
+  notifyObservers() {
+    this.observers.forEach(observer => observer());
+  }
+
 
   async initializeCache(): Promise<void> {
     try {
@@ -61,14 +76,17 @@ export class GTDController {
 
   async createTask(task: Omit<TaskModel, 'id'>): Promise<TaskModel> {
     const newTask: TaskModel = { ...task, id: 0 };
+    this.notifyObservers()
     return this.dataSource.addTask(newTask);
   }
 
   async updateTask(task: TaskModel): Promise<TaskModel> {
+    this.notifyObservers()
     return this.dataSource.updateTask(task);
   }
 
   async deleteTask(taskId: number): Promise<boolean> {
+    this.notifyObservers()
     return this.dataSource.deleteTask(taskId);
   }
 

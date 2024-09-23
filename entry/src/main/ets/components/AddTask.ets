@@ -22,28 +22,27 @@ export struct AddTaskComponent {
 
   @State selectedContext: ContextModel|null = null;
   @State selectedProject: ProjectModel|null = null;
-  @State contexts: string[] = ['工作', '家庭', '学习', '娱乐'] // 这里可以根据实际情况从数据源获取
 
   // formatDateToChinese(new Date());
 
 
-  onConfirm: (task: TaskModel) => void;
+  onConfirm: (task: TaskModel, isUpdate: boolean) => void;
   onCancel: () => void;
 
   aboutToAppear() {
-    // if (this.currentEditingTask) {
-    //   // 编辑模式：使用当前编辑的任务填充状态
-    //   this.title = this.currentEditingTask.title;
-    //   this.description = this.currentEditingTask.description || '';
-    //   this.dueDate = this.currentEditingTask.dueDate || new Date();
-    //   this.isCompleted = this.currentEditingTask.isCompleted;
-    //   this.priority = this.currentEditingTask.priority || null;
-    //   this.projectId = this.currentEditingTask.projectId;
-    //   this.contextId = this.currentEditingTask.contextId;
-    //   this.flagged = this.currentEditingTask.flagged || false;
-    //   this.reminder = this.currentEditingTask.reminder;
-    //   this.dueDateString = formatDateToChinese(this.dueDate);
-    // }
+    if (this.currentEditingTask) {
+      // 编辑模式：使用当前编辑的任务填充状态
+      this.title = this.currentEditingTask.title;
+      this.description = this.currentEditingTask.description || '';
+      // this.dueDateString = this.currentEditingTask.dueDate || new Date();
+      this.isCompleted = this.currentEditingTask.isCompleted;
+      this.priority = this.currentEditingTask.priority || null;
+      this.projectId = this.currentEditingTask.projectId;
+      this.contextId = this.currentEditingTask.contextId;
+      this.flagged = this.currentEditingTask.flagged || false;
+      this.reminder = this.currentEditingTask.reminder;
+      this.dueDateString = formatDateToChinese(this.currentEditingTask.dueDate);
+    }
   }
 
   @Builder DateSelector() {
@@ -202,7 +201,21 @@ export struct AddTaskComponent {
       .backgroundColor(Color.Blue)
       .borderRadius(5)
       .onClick(() => {
-        const task: TaskModel = {
+        const task: TaskModel = this.currentEditingTask
+        ? {
+            ...this.currentEditingTask,
+            title: this.title,
+            description: this.description,
+            dueDate: parseDate(this.dueDateString),
+            isCompleted: this.isCompleted,
+            priority: this.priority,
+            projectId: this.selectedProject?.id,
+            contextId: this.selectedContext?.id,
+            flagged: this.flagged,
+            reminder: this.reminder,
+            modifyTime: new Date()
+          }
+        : {
           id: 0, // 新任务的id设为0，让数据源来分配真正的id
           title: this.title,
           description: this.description,
@@ -217,7 +230,8 @@ export struct AddTaskComponent {
           modifyTime: new Date()
         };
         hilog.debug(0x001, 'EditTasks',`${JSON.stringify(task)}`)
-        this.onConfirm(task);
+
+        this.onConfirm(task, !!this.currentEditingTask);
       })
     }
   }

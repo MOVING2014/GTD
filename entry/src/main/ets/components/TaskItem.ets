@@ -9,21 +9,23 @@ export struct TaskList {
   @Link tasks: TaskModel[];
   @State projects: ProjectModel[]|null = null;
   @Consume gtdController: GTDController;
+  @Consume currentEditingTask: TaskModel;
+  @Consume isPopupVisible: boolean;
   @State showCompletedTasks: boolean = false
 
 
 aboutToAppear(){
-  this.loadTasks()
+  // this.loadTasks()
 }
 
-  async loadTasks() {
-    try {
-      this.tasks = await this.gtdController.getAllTasks();
-      hilog.debug(0x001,'TaskItem',`load tasks ${JSON.stringify(this.tasks)}`)
-    } catch (error) {
-      console.error('Failed to load tasks:', error);
-    }
-  }
+  // async loadTasks() {
+  //   try {
+  //     this.tasks = await this.gtdController.getAllTasks();
+  //     hilog.debug(0x009,'TaskItem',`TaskItem load tasks ${JSON.stringify(this.tasks)}`)
+  //   } catch (error) {
+  //     console.error('Failed to load tasks:', error);
+  //   }
+  // }
 
 
 
@@ -70,8 +72,10 @@ aboutToAppear(){
       }
       .backgroundColor(Constants.editButtonColor)
       .onClick(() => {
-        // this.currentEditingRecord = record;
-        // this.isPopupVisible = true;
+        this.currentEditingTask = record;
+        this.isPopupVisible = true;
+        hilog.debug(0x009,'TaskItem',`TaskItem load tasks ${JSON.stringify(this.tasks)}`)
+        // this.loadTasks()
       })
       .margin({right:10})
       // 侧滑后尾端出现的组件
@@ -86,7 +90,7 @@ aboutToAppear(){
       .onClick(async () => {
         // this.controller.deleteMoodRecord(record.id)
        let result =  await this.gtdController.deleteTask(record.id)
-        this.loadTasks()
+        // this.loadTasks()
         hilog.debug(0x001,'TaskItem',`delted result ${result}`)
         hilog.debug(0x001,'TaskItem',`delted result ${JSON.stringify(await this.gtdController.getAllTasks())}`)
       })
@@ -107,7 +111,7 @@ aboutToAppear(){
                   task.isCompleted = isOn;
                   task.modifyTime = new Date();
                   this.gtdController.updateTask(task);
-                  this.loadTasks()
+                  // this.loadTasks()
                 })
                 .margin({ right: 10 })
                 .alignSelf(ItemAlign.Start) // 确保复选框顶部对齐
@@ -195,7 +199,7 @@ aboutToAppear(){
                   .onChange((isOn: boolean) => {
                     task.isCompleted = isOn;
                     this.gtdController.updateTask(task);
-                    this.loadTasks()
+                    // this.loadTasks()
                   })
                   .margin({ right: 10 })
                   .alignSelf(ItemAlign.Start) // 确保复选框顶部对齐

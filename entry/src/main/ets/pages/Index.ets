@@ -10,15 +10,17 @@ import hilog from '@ohos.hilog';
 struct Index {
   @Provide gtdController: GTDController = new GTDController();
   @Provide currentEditingTask: TaskModel |null = null;
+  @Provide isPopupVisible: boolean = false;
 
   private tabsController: TabsController = new TabsController();
   @State currentIndex: number = 0;
   @State tasks: TaskModel[] = [];
-  @State isPopupVisible: boolean = false;
+
   @State popupTranslateY: number = 100;
 
 
   aboutToAppear() {
+    this.gtdController.addObserver(()=>this.loadTasks())
     this.loadTasks();
   }
 
@@ -101,20 +103,21 @@ struct Index {
 
             AddTaskComponent({
 
-              onConfirm: async (record: TaskModel) => {
-                // if (isUpdate) {
-                //   await this.gtdController.updateTask(record);
-                //   promptAction.showToast({ message: '更新成功', duration: 2000 });
-                // // } else {
-                //   await this.gtdController.createTask(record);
-                //   promptAction.showToast({ message: '添加成功', duration: 2000 });
-                // // }
+              onConfirm: async (record: TaskModel, isUpdate: boolean) => {
+                if (isUpdate) {
+                  const updatedTask = await this.gtdController.updateTask(record);
+                  hilog.debug(0x001,'indexPage',`${JSON.stringify(updatedTask)}`)
+                  promptAction.showToast({ message: '更新成功', duration: 2000 });
+                } else {
+                  await this.gtdController.createTask(record);
+                  promptAction.showToast({ message: '添加成功', duration: 2000 });
+                }
 
-                await this.gtdController.createTask(record);
+                // await this.gtdController.createTask(record);
                 this.loadTasks();
                 // hilog.debug(0x001,'index',`${JSON.stringify(this.tasks)}`)
                 this.hidePopup();
-                hilog.debug(0x001,'tasksload',`tasksload:  ${JSON.stringify(this.tasks)}`)
+                hilog.debug(0x009,'indexPage',`tasksload:  ${JSON.stringify(this.tasks)}`)
 
               },
               onCancel: () => {
@@ -137,7 +140,7 @@ struct Index {
             .margin({ bottom: 30, right: 20 })
             .onClick(() => {
               this.showPopup()
-              // this.currentEditingTask = null;
+              this.currentEditingTask = null;
             })
           }
 
