@@ -74,9 +74,9 @@ struct Index {
 
         Stack({ alignContent: Alignment.Bottom }) {
           Column() {
-            Text("收件箱")
+            Text("待办事项")
               .fontSize(24)
-              .fontWeight(FontWeight.Bold)
+              .fontWeight(FontWeight.Medium)
               .padding({ top: 20, bottom: 10 })
 
             TaskList({
@@ -143,7 +143,7 @@ struct Index {
 
         }
       }
-      .tabBar(this.TabBuilder("收件箱", 0, "📥"))
+      .tabBar(this.TabBuilder("日历", 0, "📅"))
 
       TabContent() {
         // 项目页面内容
@@ -151,7 +151,15 @@ struct Index {
           .fontSize(50)
           .fontWeight(FontWeight.Bold)
       }
-      .tabBar(this.TabBuilder("项目", 1, "📁"))
+      .tabBar(this.TabBuilder("收集箱", 1, "📥"))
+
+      TabContent() {
+        // 项目页面内容
+        Text("项目")
+          .fontSize(50)
+          .fontWeight(FontWeight.Bold)
+      }
+      .tabBar(this.TabBuilder("项目", 2, "📁"))
 
       TabContent() {
         // Context页面内容
@@ -159,7 +167,7 @@ struct Index {
           .fontSize(50)
           .fontWeight(FontWeight.Bold)
       }
-      .tabBar(this.TabBuilder("Context", 2, "🏷️"))
+      .tabBar(this.TabBuilder("Context", 3, "🏷️"))
 
       TabContent() {
         // Flagged页面内容
@@ -167,7 +175,7 @@ struct Index {
           .fontSize(50)
           .fontWeight(FontWeight.Bold)
       }
-      .tabBar(this.TabBuilder("Flagged", 3, "🚩"))
+      .tabBar(this.TabBuilder("Flagged", 4, "🚩"))
     }
     .onChange((index: number) => {
       this.currentIndex = index;
