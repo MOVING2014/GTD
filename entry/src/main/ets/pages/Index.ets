@@ -4,6 +4,7 @@ import {  TaskList } from '../components/TaskItem'
 import { AddTaskComponent } from '../components/AddTask';
 import promptAction from '@ohos.promptAction';
 import hilog from '@ohos.hilog';
+import { EditTaskComponent } from '../components/EditTask';
 
 @Entry
 @Component
@@ -15,7 +16,6 @@ struct Index {
   private tabsController: TabsController = new TabsController();
   @State currentIndex: number = 0;
   @State tasks: TaskModel[] = [];
-
   @State popupTranslateY: number = 100;
 
 
@@ -101,23 +101,47 @@ struct Index {
               .onAppear(() => this.showPopup())
               .onClick(() => this.hidePopup())
 
-            AddTaskComponent({
-
-              onConfirm: async (record: TaskModel) => {
+            if(this.currentEditingTask.id === -1){
+              AddTaskComponent({
+                onConfirm: async (record: TaskModel) => {
                   await this.gtdController.createTask(record);
                   promptAction.showToast({ message: '添加成功', duration: 2000 });
 
-                this.loadTasks();
-                // hilog.debug(0x001,'index',`${JSON.stringify(this.tasks)}`)
-                this.hidePopup();
-                hilog.debug(0x009,'indexPage',`tasksload:  ${JSON.stringify(this.tasks[1])}`)
+                  this.loadTasks();
+                  // hilog.debug(0x001,'index',`${JSON.stringify(this.tasks)}`)
+                  this.hidePopup();
+                  hilog.debug(0x009,'indexPage',`tasksload:  ${JSON.stringify(this.tasks[1])}`)
 
-              },
-              onCancel: () => {
-                this.hidePopup();
-              }
-            })
-              .translate({ y: this.popupTranslateY })
+                },
+                onCancel: () => {
+                  this.hidePopup();
+                }
+              })
+                .translate({ y: this.popupTranslateY })
+            }else {
+              EditTaskComponent(
+                {
+                  onConfirm: async (record: TaskModel) => {
+                    await this.gtdController.updateTask(record);
+                    promptAction.showToast({ message: '添加成功', duration: 2000 });
+
+                    this.loadTasks();
+                    // hilog.debug(0x001,'index',`${JSON.stringify(this.tasks)}`)
+                    this.hidePopup();
+                    hilog.debug(0x009,'indexPage',`tasksload:  ${JSON.stringify(this.tasks[1])}`)
+
+                  },
+                  onCancel: () => {
+                    this.hidePopup();
+                  }
+
+                }
+              )
+                .translate({ y: this.popupTranslateY })
+
+            }
+
+
           }
 
           if (!this.isPopupVisible) {

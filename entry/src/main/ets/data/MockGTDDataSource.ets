@@ -100,7 +100,7 @@ export  class MockGTDDataSource implements GTDDataSource {
     return Promise.resolve(task || null);
   }
 
-  async addTask(task: TaskModel): Promise<TaskModel> {
+  async addTask(task: TaskModel): Promise<void> {
     task.id = this.tasks.length + 1;
     // 确保 project 和 context 对象存在
     if (task.project) {
@@ -112,12 +112,12 @@ export  class MockGTDDataSource implements GTDDataSource {
       task.context = fullContext || undefined;
     }
     this.tasks.push(task);
-    return Promise.resolve(task);
+
   }
 
 
 
-  async updateTask(task: TaskModel): Promise<TaskModel> {
+  async updateTask(task: TaskModel): Promise<void> {
     const index = this.tasks.findIndex(t => t.id === task.id);
     if (index !== -1) {
       // 更新 project 和 context 对象
@@ -130,18 +130,17 @@ export  class MockGTDDataSource implements GTDDataSource {
         task.context = fullContext || undefined;
       }
       this.tasks[index] = {...task};
-      return Promise.resolve({...task});
+
     }
     return Promise.reject(new Error("Task not found"));
   }
 
-  async deleteTask(taskId: number): Promise<boolean> {
+  async deleteTask(taskId: number): Promise<void> {
     const index = this.tasks.findIndex(t => t.id === taskId);
     if (index !== -1) {
       this.tasks.splice(index, 1);
-      return Promise.resolve(true);
     }
-    return Promise.resolve(false);
+
   }
 
   // Project methods

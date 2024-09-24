@@ -3,9 +3,9 @@ import { TaskModel, ProjectModel, ContextModel, ReminderModel } from '../models/
 export interface TaskDataSource {
   getTasks(): Promise<TaskModel[]>;
   getTaskById(taskId: number): Promise<TaskModel | null>;
-  addTask(task: TaskModel): Promise<TaskModel>;
-  updateTask(task: TaskModel): Promise<TaskModel>;
-  deleteTask(taskId: number): Promise<boolean>;
+  addTask(task: TaskModel): Promise<void>;
+  updateTask(task: TaskModel): Promise<void>;
+  deleteTask(taskId: number): Promise<void>;
 }
 
 export interface ProjectDataSource {

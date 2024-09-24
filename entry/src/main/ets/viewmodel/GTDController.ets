@@ -74,20 +74,22 @@ export class GTDController {
     return this.dataSource.getTaskById(id)
   }
 
-  async createTask(task: Omit<TaskModel, 'id'>): Promise<TaskModel> {
+  async createTask(task: Omit<TaskModel, 'id'>): Promise<void> {
     const newTask: TaskModel = { ...task, id: 0 };
+    this.dataSource.addTask(newTask);
     this.notifyObservers()
-    return this.dataSource.addTask(newTask);
   }
 
-  async updateTask(task: TaskModel): Promise<TaskModel> {
+  async updateTask(task: TaskModel): Promise<void> {
+
+    this.dataSource.updateTask(task);
     this.notifyObservers()
-    return this.dataSource.updateTask(task);
+
   }
 
-  async deleteTask(taskId: number): Promise<boolean> {
+  async deleteTask(taskId: number): Promise<void> {
+    this.dataSource.deleteTask(taskId);
     this.notifyObservers()
-    return this.dataSource.deleteTask(taskId);
   }
 
   async getTasksByProject(projectId: number): Promise<TaskModel[]> {
@@ -185,15 +187,15 @@ export class GTDController {
     return tasks.filter(task => task.flagged);
   }
 
-  async completeTask(taskId: number): Promise<TaskModel> {
-    const task = (await this.dataSource.getTasks()).find(t => t.id === taskId);
-    if (!task) {
-      throw new Error("Task not found");
-    }
-    task.isCompleted = true;
-    return this.dataSource.updateTask(task);
-  }
+  // async completeTask(taskId: number): Promise<TaskModel> {
+  //   const task = (await this.dataSource.getTasks()).find(t => t.id === taskId);
+  //   if (!task) {
+  //     throw new Error("Task not found");
+  //   }
+  //   task.isCompleted = true;
+  //   return this.dataSource.updateTask(task);
+  // }
 }
 
 // 导出 controller 实例
-export const gtdController = new GTDController();
+// export const gtdController = new GTDController();
