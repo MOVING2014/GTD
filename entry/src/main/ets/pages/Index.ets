@@ -126,7 +126,7 @@ struct Index {
                     promptAction.showToast({ message: '添加成功', duration: 2000 });
 
                     this.loadTasks();
-                    // hilog.debug(0x001,'index',`${JSON.stringify(this.tasks)}`)
+                    hilog.debug(0x009,'indexPage',`${JSON.stringify(this.tasks)}`)
                     this.hidePopup();
                     hilog.debug(0x009,'indexPage',`tasksload:  ${JSON.stringify(this.tasks[1])}`)
 

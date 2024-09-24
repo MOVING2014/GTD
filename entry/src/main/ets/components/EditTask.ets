@@ -140,6 +140,7 @@ export struct EditTaskComponent {
         MenuItem({ content: project.name })
           .onClick(() => {
             this.selectedProject = project
+            this.currentEditingTask.project = project
             // 这里可以添加选择 context 后的逻辑，比如更新任务的 context
           })
 
@@ -164,13 +165,12 @@ export struct EditTaskComponent {
       .borderRadius(5)
       .onClick(() => {
         hilog.debug(0x009, 'AddTask', `onclick : ${this.selectedProject.name}`)
+        this.currentEditingTask.dueDate = parseDate(this.dueDateString)
+        this.currentEditingTask.context = this.selectedContext || undefined
+        this.currentEditingTask.modifyTime = new Date()
+
         const task: TaskModel = {
           ...this.currentEditingTask,
-          dueDate: parseDate(this.dueDateString),
-          createdDate: new Date(), // 为新任务设置创建日期
-          project: this.selectedProject.id != -1 ? this.selectedProject : undefined,
-          context: this.selectedContext.id != -1 ? this.selectedContext : undefined,
-          modifyTime: new Date()
         };
         hilog.debug(0x009, 'AddTask', `onclickprojectId : ${this.selectedProject.name}`)
         hilog.debug(0x009, 'EditTasks',`${JSON.stringify(task)}`)

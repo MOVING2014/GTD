@@ -120,17 +120,34 @@ export  class MockGTDDataSource implements GTDDataSource {
   async updateTask(task: TaskModel): Promise<void> {
     const index = this.tasks.findIndex(t => t.id === task.id);
     if (index !== -1) {
-      // 更新 project 和 context 对象
-      if (task.project) {
-        const fullProject = await this.getProjectById(task.project.id);
-        task.project = fullProject || undefined;
-      }
-      if (task.context) {
-        const fullContext = await this.getContextById(task.context.id);
-        task.context = fullContext || undefined;
-      }
-      this.tasks[index] = {...task};
-
+      // 创建一个新的任务对象，深拷贝原始任务的所有属性
+      const updatedTask: TaskModel = JSON.parse(JSON.stringify(task));
+      this.tasks[index] = updatedTask;
+      // // 更新 project 对象
+      // if (task.project.id !== undefined) {
+      //   const fullProject = await this.getProjectById(task.project.id);
+      //   updatedTask.project = fullProject || undefined;
+      // } else {
+      //   updatedTask.project = undefined;
+      // }
+      //
+      // // 更新 context 对象
+      // if (task.context.id !== undefined) {
+      //   const fullContext = await this.getContextById(task.context.id);
+      //   updatedTask.context = fullContext || undefined;
+      // } else {
+      //   updatedTask.context = undefined;
+      // }
+      //
+      // // 更新 reminder 对象（如果存在）
+      // if (task.reminder && task.reminder.id !== undefined) {
+      //   const fullReminder = await this.getReminderById(task.reminder.id);
+      //   updatedTask.reminder = fullReminder || undefined;
+      // }
+      //
+      // // 更新任务
+      // this.tasks[index] = updatedTask;
+      return Promise.resolve();
     }
     return Promise.reject(new Error("Task not found"));
   }
@@ -149,18 +166,18 @@ export  class MockGTDDataSource implements GTDDataSource {
   }
 
   async getProjectById(projectId: number): Promise<ProjectModel | null> {
-    const project = this.projects.find(p => p.id === projectId);
+    const project = await this.projects.find(p => p.id === projectId);
     return Promise.resolve(project || null);
   }
 
   async addProject(project: ProjectModel): Promise<ProjectModel> {
-    project.id = this.projects.length + 1;
+    project.id = await this.projects.length + 1;
     this.projects.push(project);
     return Promise.resolve(project);
   }
 
   async updateProject(project: ProjectModel): Promise<ProjectModel> {
-    const index = this.projects.findIndex(p => p.id === project.id);
+    const index = await this.projects.findIndex(p => p.id === project.id);
     if (index !== -1) {
       this.projects[index] = project;
       return Promise.resolve(project);
