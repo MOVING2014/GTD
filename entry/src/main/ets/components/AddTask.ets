@@ -131,7 +131,7 @@ export struct AddTaskComponent {
     Column() {
       Button({ type: ButtonType.Normal, stateEffect: true }) {
         Row() {
-          Text(this.selectedProject? this.selectedProject.name : '项目')
+          Text(this.selectedProject.id !=-1 ? this.selectedProject.name : '项目')
             .fontSize(16)
             .fontColor(Color.Gray)
         }
