@@ -12,16 +12,16 @@ export struct AddTaskComponent {
   // @State dueDate: Date |undefined = undefined; //@State 不能修饰Date变量
   @State isCompleted: boolean = false;
   @State priority: 'Low' | 'Medium' | 'High'|'None'  = 'None';
-  @State projectId: number | undefined = undefined;
-  @State contextId: number | undefined = undefined;
+  @State projectId: number  = -1;
+  @State contextId: number  = -1;
   @State flagged: boolean = false;
-  @State reminder: ReminderModel | undefined = undefined;
+  @State reminder: ReminderModel | { id: -1, name : '', time: Date } = { id: -1, name : '',time: new Date(0)  };
   @Consume currentEditingTask: TaskModel;
   @Consume  gtdController: GTDController;
   @State dueDateString: string = ''
 
-  @State selectedContext: ContextModel|null = null;
-  @State selectedProject: ProjectModel|null = null;
+  @State selectedContext: ContextModel| { id: -1, name : '' }  = { id: -1, name : '' } ;
+  @State selectedProject: ProjectModel| { id: -1, name : '' }  = { id: -1, name : '' } ;
 
   // formatDateToChinese(new Date());
 
@@ -30,18 +30,21 @@ export struct AddTaskComponent {
   onCancel: () => void;
 
   aboutToAppear() {
-    if (this.currentEditingTask) {
+    if (this.currentEditingTask.id != -1) {
       // 编辑模式：使用当前编辑的任务填充状态
       this.title = this.currentEditingTask.title;
       this.description = this.currentEditingTask.description || '';
       // this.dueDateString = this.currentEditingTask.dueDate || new Date();
       this.isCompleted = this.currentEditingTask.isCompleted;
-      this.priority = this.currentEditingTask.priority || null;
-      this.projectId = this.currentEditingTask.projectId;
-      this.contextId = this.currentEditingTask.contextId;
-      this.flagged = this.currentEditingTask.flagged || false;
+      this.priority = this.currentEditingTask.priority ;
+      this.projectId = this.currentEditingTask.projectId ;
+      this.contextId = this.currentEditingTask.contextId ;
+      this.flagged = this.currentEditingTask.flagged ;
       this.reminder = this.currentEditingTask.reminder;
       this.dueDateString = formatDateToChinese(this.currentEditingTask.dueDate);
+
+      hilog.debug(0x009, 'AddTask', `currentEditingTask: ${JSON.stringify(this.currentEditingTask)}`)
+      hilog.debug(0x009, 'AddTask', `currentEditingTask: ${this.projectId}`)
     }
   }
 
@@ -90,7 +93,7 @@ export struct AddTaskComponent {
     Column() {
       Button({ type: ButtonType.Normal, stateEffect: true }) {
         Row() {
-          Text(this.selectedContext ? this.selectedContext.name : '场景')
+          Text(this.selectedContext.id != -1 ? this.selectedContext.name : '场景')
             .fontSize(16)
             .fontColor(Color.Gray)
         }
@@ -201,7 +204,8 @@ export struct AddTaskComponent {
       .backgroundColor(Color.Blue)
       .borderRadius(5)
       .onClick(() => {
-        const task: TaskModel = this.currentEditingTask
+        hilog.debug(0x009, 'AddTask', `onclick : ${this.projectId}`)
+        const task: TaskModel = this.currentEditingTask.id != -1
         ? {
             ...this.currentEditingTask,
             title: this.title,
@@ -229,9 +233,10 @@ export struct AddTaskComponent {
           reminder: this.reminder,
           modifyTime: new Date()
         };
-        hilog.debug(0x001, 'EditTasks',`${JSON.stringify(task)}`)
+        hilog.debug(0x009, 'AddTask', `onclickprojectId : ${this.projectId}`)
+        hilog.debug(0x009, 'EditTasks',`${JSON.stringify(task)}`)
 
-        this.onConfirm(task, !!this.currentEditingTask);
+        this.onConfirm(task, this.currentEditingTask.id != -1);
       })
     }
   }

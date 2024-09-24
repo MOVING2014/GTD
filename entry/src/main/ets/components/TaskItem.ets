@@ -74,7 +74,7 @@ aboutToAppear(){
       .onClick(() => {
         this.currentEditingTask = record;
         this.isPopupVisible = true;
-        hilog.debug(0x009,'TaskItem',`TaskItem load tasks ${JSON.stringify(this.tasks)}`)
+        hilog.debug(0x009,'TaskItem',`TaskItem load tasks ${JSON.stringify(this.tasks[1])}`)
         // this.loadTasks()
       })
       .margin({right:10})

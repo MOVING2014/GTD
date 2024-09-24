@@ -69,7 +69,10 @@ export function getMoodColor(level: number): string {
 }
 
 
-export  function formatDateToChinese(date: Date, withYear: boolean = true ): string {
+export  function formatDateToChinese(date: Date|undefined, withYear: boolean = true ): string {
+  if(!date){
+    return ''
+  }
   const year = date.getFullYear();
   const month = date.getMonth() + 1; // getMonth() 返回 0-11
   const day = date.getDate();
@@ -88,7 +91,7 @@ export  function  parseDate(dateString: string): Date {
 
     let parts = dateString.match(/(\d+)/g);
     return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-  
+
 }
 
 

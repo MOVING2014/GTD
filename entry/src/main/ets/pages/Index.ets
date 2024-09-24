@@ -9,7 +9,7 @@ import hilog from '@ohos.hilog';
 @Component
 struct Index {
   @Provide gtdController: GTDController = new GTDController();
-  @Provide currentEditingTask: TaskModel |null = null;
+  @Provide currentEditingTask: TaskModel | {id:-1, name:'', createdDate:Date, isCompleted:boolean } = {id:-1, name:'', createdDate:new Date(0), isCompleted:false};
   @Provide isPopupVisible: boolean = false;
 
   private tabsController: TabsController = new TabsController();
@@ -106,7 +106,8 @@ struct Index {
               onConfirm: async (record: TaskModel, isUpdate: boolean) => {
                 if (isUpdate) {
                   const updatedTask = await this.gtdController.updateTask(record);
-                  hilog.debug(0x001,'indexPage',`${JSON.stringify(updatedTask)}`)
+                  hilog.debug(0x009,'indexPage',`record: ${JSON.stringify(record)}`)
+                  hilog.debug(0x009,'indexPage',`${JSON.stringify(updatedTask)}`)
                   promptAction.showToast({ message: '更新成功', duration: 2000 });
                 } else {
                   await this.gtdController.createTask(record);
@@ -117,7 +118,7 @@ struct Index {
                 this.loadTasks();
                 // hilog.debug(0x001,'index',`${JSON.stringify(this.tasks)}`)
                 this.hidePopup();
-                hilog.debug(0x009,'indexPage',`tasksload:  ${JSON.stringify(this.tasks)}`)
+                hilog.debug(0x009,'indexPage',`tasksload:  ${JSON.stringify(this.tasks[1])}`)
 
               },
               onCancel: () => {
@@ -139,8 +140,8 @@ struct Index {
             .height(36)
             .margin({ bottom: 30, right: 20 })
             .onClick(() => {
+              this.currentEditingTask = {id:-1, name:'', createdDate:new Date(0), isCompleted:false};
               this.showPopup()
-              this.currentEditingTask = null;
             })
           }
 
