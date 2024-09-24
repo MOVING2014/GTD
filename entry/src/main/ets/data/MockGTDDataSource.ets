@@ -11,8 +11,17 @@ export  class MockGTDDataSource implements GTDDataSource {
       dueDate: new Date("2023-05-07"),
       priority: "High",
       isCompleted: false,
-      projectId: 1,
-      contextId: 1,
+      project: {
+        id: 1,
+        name: "X项目流程",
+        description: "与工作相关的所有任务",
+        taskIds: [1]
+      },
+      context: {
+        id: 1,
+        name: "💼办公室",
+        description: "在办公室可以完成的任务"
+      },
       flagged: true,
       reminder: {
         id: 1,
@@ -23,13 +32,21 @@ export  class MockGTDDataSource implements GTDDataSource {
     {
       id: 2,
       title: "购买日用品",
-      projectId:2,
       createdDate: new Date("2023-05-02"),
       isCompleted: false,
-      contextId: 2
+      project: {
+        id: 2,
+        name: "网球",
+        description: "与工作相关的所有任务",
+        taskIds: [2]
+      },
+      context: {
+        id: 2,
+        name: "🏠家",
+        description: "在家可以完成的任务"
+      }
     }
   ];
-
   private projects: ProjectModel[] = [
     {
       id: 1,
@@ -85,15 +102,35 @@ export  class MockGTDDataSource implements GTDDataSource {
 
   async addTask(task: TaskModel): Promise<TaskModel> {
     task.id = this.tasks.length + 1;
+    // 确保 project 和 context 对象存在
+    if (task.project) {
+      const fullProject = await this.getProjectById(task.project.id);
+      task.project = fullProject || undefined;
+    }
+    if (task.context) {
+      const fullContext = await this.getContextById(task.context.id);
+      task.context = fullContext || undefined;
+    }
     this.tasks.push(task);
     return Promise.resolve(task);
   }
 
+
+
   async updateTask(task: TaskModel): Promise<TaskModel> {
     const index = this.tasks.findIndex(t => t.id === task.id);
     if (index !== -1) {
-      this.tasks[index] = task;
-      return Promise.resolve(task);
+      // 更新 project 和 context 对象
+      if (task.project) {
+        const fullProject = await this.getProjectById(task.project.id);
+        task.project = fullProject || undefined;
+      }
+      if (task.context) {
+        const fullContext = await this.getContextById(task.context.id);
+        task.context = fullContext || undefined;
+      }
+      this.tasks[index] = {...task};
+      return Promise.resolve({...task});
     }
     return Promise.reject(new Error("Task not found"));
   }
@@ -135,7 +172,17 @@ export  class MockGTDDataSource implements GTDDataSource {
   async deleteProject(projectId: number): Promise<boolean> {
     const index = this.projects.findIndex(p => p.id === projectId);
     if (index !== -1) {
+      // 删除项目
       this.projects.splice(index, 1);
+
+      // 更新相关任务
+      this.tasks = this.tasks.map(task => {
+        if (task.project && task.project.id === projectId) {
+          return { ...task, project: undefined };
+        }
+        return task;
+      });
+
       return Promise.resolve(true);
     }
     return Promise.resolve(false);
@@ -170,7 +217,17 @@ export  class MockGTDDataSource implements GTDDataSource {
   async deleteContext(contextId: number): Promise<boolean> {
     const index = this.contexts.findIndex(c => c.id === contextId);
     if (index !== -1) {
+      // 删除上下文
       this.contexts.splice(index, 1);
+
+      // 更新相关任务
+      this.tasks = this.tasks.map(task => {
+        if (task.context && task.context.id === contextId) {
+          return { ...task, context: undefined };
+        }
+        return task;
+      });
+
       return Promise.resolve(true);
     }
     return Promise.resolve(false);
@@ -201,12 +258,19 @@ export  class MockGTDDataSource implements GTDDataSource {
   async deleteReminder(reminderId: number): Promise<boolean> {
     const index = this.reminders.findIndex(r => r.id === reminderId);
     if (index !== -1) {
+      // 删除提醒
       this.reminders.splice(index, 1);
+
+      // 更新相关任务
+      this.tasks.forEach(task => {
+        if (task.reminder && task.reminder.id === reminderId) {
+          task.reminder = undefined;
+        }
+      });
+
       return Promise.resolve(true);
     }
     return Promise.resolve(false);
   }
 }
 
-// 导出模拟数据源实例
-// export const mockGTDDataSource: GTDDataSource = new MockGTDDataSource();

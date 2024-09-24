@@ -103,18 +103,10 @@ struct Index {
 
             AddTaskComponent({
 
-              onConfirm: async (record: TaskModel, isUpdate: boolean) => {
-                if (isUpdate) {
-                  const updatedTask = await this.gtdController.updateTask(record);
-                  hilog.debug(0x009,'indexPage',`record: ${JSON.stringify(record)}`)
-                  hilog.debug(0x009,'indexPage',`${JSON.stringify(updatedTask)}`)
-                  promptAction.showToast({ message: '更新成功', duration: 2000 });
-                } else {
+              onConfirm: async (record: TaskModel) => {
                   await this.gtdController.createTask(record);
                   promptAction.showToast({ message: '添加成功', duration: 2000 });
-                }
 
-                // await this.gtdController.createTask(record);
                 this.loadTasks();
                 // hilog.debug(0x001,'index',`${JSON.stringify(this.tasks)}`)
                 this.hidePopup();

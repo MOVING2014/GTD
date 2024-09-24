@@ -16,36 +16,19 @@ export struct AddTaskComponent {
   @State contextId: number  = -1;
   @State flagged: boolean = false;
   @State reminder: ReminderModel | { id: -1, name : '', time: Date } = { id: -1, name : '',time: new Date(0)  };
-  @Consume currentEditingTask: TaskModel;
   @Consume  gtdController: GTDController;
   @State dueDateString: string = ''
 
   @State selectedContext: ContextModel| { id: -1, name : '' }  = { id: -1, name : '' } ;
   @State selectedProject: ProjectModel| { id: -1, name : '' }  = { id: -1, name : '' } ;
 
-  // formatDateToChinese(new Date());
 
 
-  onConfirm: (task: TaskModel, isUpdate: boolean) => void;
+  onConfirm: (task: TaskModel) => void;
   onCancel: () => void;
 
   aboutToAppear() {
-    if (this.currentEditingTask.id != -1) {
-      // 编辑模式：使用当前编辑的任务填充状态
-      this.title = this.currentEditingTask.title;
-      this.description = this.currentEditingTask.description || '';
-      // this.dueDateString = this.currentEditingTask.dueDate || new Date();
-      this.isCompleted = this.currentEditingTask.isCompleted;
-      this.priority = this.currentEditingTask.priority ;
-      this.projectId = this.currentEditingTask.projectId ;
-      this.contextId = this.currentEditingTask.contextId ;
-      this.flagged = this.currentEditingTask.flagged ;
-      this.reminder = this.currentEditingTask.reminder;
-      this.dueDateString = formatDateToChinese(this.currentEditingTask.dueDate);
 
-      hilog.debug(0x009, 'AddTask', `currentEditingTask: ${JSON.stringify(this.currentEditingTask)}`)
-      hilog.debug(0x009, 'AddTask', `currentEditingTask: ${this.projectId}`)
-    }
   }
 
   @Builder DateSelector() {
@@ -112,7 +95,7 @@ export struct AddTaskComponent {
     Menu() {
       MenuItem({ content: '无场景' })
         .onClick(() => {
-          this.selectedContext = null
+          this.selectedContext =  { id: -1, name : '' } ;
           // 这里可以添加清除选择后的逻辑
         })
 
@@ -151,29 +134,9 @@ export struct AddTaskComponent {
 
   @Builder ProjectMenuBuilder() {
     Menu() {
-
-      // Column(){
-      //   Row(){
-      //     Text("无项目")
-      //       .onClick(()=>{this.selectedProject = null})
-      //
-      //   }
-      //   ForEach(Object.values(this.gtdController.projectCache), (project: ProjectModel) => {
-      //     Row(){
-      //       Text(project.name)
-      //           .onClick(() => {
-      //             this.selectedProject = project
-      //             // 这里可以添加选择 context 后的逻辑，比如更新任务的 context
-      //           })
-      //     }
-      //
-      //   })
-      //
-      //
-      // }
       MenuItem({ content: '无项目' })
         .onClick(() => {
-          this.selectedProject = null
+          this.selectedProject =  { id: -1, name : '' } ;
           // 这里可以添加清除选择后的逻辑
         })
 
@@ -205,21 +168,7 @@ export struct AddTaskComponent {
       .borderRadius(5)
       .onClick(() => {
         hilog.debug(0x009, 'AddTask', `onclick : ${this.projectId}`)
-        const task: TaskModel = this.currentEditingTask.id != -1
-        ? {
-            ...this.currentEditingTask,
-            title: this.title,
-            description: this.description,
-            dueDate: parseDate(this.dueDateString),
-            isCompleted: this.isCompleted,
-            priority: this.priority,
-            projectId: this.selectedProject?.id,
-            contextId: this.selectedContext?.id,
-            flagged: this.flagged,
-            reminder: this.reminder,
-            modifyTime: new Date()
-          }
-        : {
+        const task: TaskModel = {
           id: 0, // 新任务的id设为0，让数据源来分配真正的id
           title: this.title,
           description: this.description,
@@ -227,8 +176,8 @@ export struct AddTaskComponent {
           isCompleted: this.isCompleted,
           priority: this.priority,
           createdDate: new Date(), // 为新任务设置创建日期
-          projectId: this.selectedProject?.id,
-          contextId: this.selectedContext?.id,
+          project: this.selectedProject.id != -1 ? this.selectedProject : undefined,
+          context: this.selectedContext.id != -1 ? this.selectedContext : undefined,
           flagged: this.flagged,
           reminder: this.reminder,
           modifyTime: new Date()
@@ -236,7 +185,7 @@ export struct AddTaskComponent {
         hilog.debug(0x009, 'AddTask', `onclickprojectId : ${this.projectId}`)
         hilog.debug(0x009, 'EditTasks',`${JSON.stringify(task)}`)
 
-        this.onConfirm(task, this.currentEditingTask.id != -1);
+        this.onConfirm(task);
       })
     }
   }

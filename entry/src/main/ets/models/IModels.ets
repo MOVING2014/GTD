@@ -6,8 +6,8 @@ export interface TaskModel {
   dueDate?: Date;
   priority?: 'Low' | 'Medium' | 'High'|'None';
   isCompleted: boolean;
-  projectId?: number;
-  contextId?: number;
+  project?: ProjectModel;
+  context?: ContextModel;
   flagged?: boolean;
   reminder?: ReminderModel;
   modifyTime?: Date;

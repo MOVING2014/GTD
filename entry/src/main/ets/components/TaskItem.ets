@@ -1,7 +1,7 @@
 import hilog from '@ohos.hilog';
 import { Constants } from '../common/Constants';
 import { formatDateToChinese, overDue } from '../common/utils';
-import { ProjectModel, TaskModel } from '../models/IModels';
+import { ContextModel, ProjectModel, TaskModel } from '../models/IModels';
 import { GTDController } from '../viewmodel/GTDController';
 
 @Component
@@ -30,10 +30,10 @@ aboutToAppear(){
 
 
   @Builder
-  ProjectLabel(projectId: number) {
-    if (projectId) {
+  ProjectLabel(project: ProjectModel) {
+    if (project) {
       Row() {
-        Text(this.gtdController.projectCache[projectId]?.name || '')
+        Text(this.gtdController.projectCache[project.id]?.name || '')
           .fontSize(16)
           .fontColor('#666666')
           .backgroundColor('#F0F0F0')
@@ -46,10 +46,10 @@ aboutToAppear(){
 
 
   @Builder
-  ContextLabel(contextId: number) {
-    if (contextId) {
+  ContextLabel(context: ContextModel) {
+    if (context) {
       Row() {
-        Text(this.gtdController.contextCache[contextId]?.name || '')
+        Text(this.gtdController.contextCache[context.id]?.name || '')
           .fontSize(16)
           .fontColor('#666666')
           .backgroundColor('#F0F0F0')
@@ -128,13 +128,13 @@ aboutToAppear(){
                   .alignSelf(ItemAlign.Start)
 
                 Row() {
-                  if (task.projectId) {
-                    this.ProjectLabel(task.projectId)
+                  if (task.project) {
+                    this.ProjectLabel(task.project)
 
                   }
 
-                  if (task.contextId) {
-                    this.ContextLabel(task.contextId)
+                  if (task.context) {
+                    this.ContextLabel(task.context)
 
                   }
 
@@ -215,13 +215,13 @@ aboutToAppear(){
                     .alignSelf(ItemAlign.Start)
 
                   Row() {
-                    if (task.projectId) {
-                      this.ProjectLabel(task.projectId)
+                    if (task.project) {
+                      this.ProjectLabel(task.project)
 
                     }
 
-                    if (task.contextId) {
-                      this.ContextLabel(task.contextId)
+                    if (task.context) {
+                      this.ContextLabel(task.context)
 
                     }
 

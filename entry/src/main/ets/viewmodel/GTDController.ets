@@ -92,14 +92,14 @@ export class GTDController {
 
   async getTasksByProject(projectId: number): Promise<TaskModel[]> {
     const tasks = await this.dataSource.getTasks();
-    return tasks.filter(task => task.projectId === projectId);
+    return tasks.filter(task => task.project.id === projectId);
   }
 
 
 
   async getTasksByContext(contextId: number): Promise<TaskModel[]> {
     const tasks = await this.dataSource.getTasks();
-    return tasks.filter(task => task.contextId === contextId);
+    return tasks.filter(task => task.context.id === contextId);
   }
 
   // Project methods
