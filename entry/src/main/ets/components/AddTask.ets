@@ -114,7 +114,7 @@ export struct AddTaskComponent {
     Menu() {
       MenuItem({ content: '无场景' })
         .onClick(() => {
-          this.selectedContext = null
+          this.selectedContext = { id: -1, name : '' }
           // 这里可以添加清除选择后的逻辑
         })
 
@@ -156,7 +156,7 @@ export struct AddTaskComponent {
 
       MenuItem({ content: '无项目' })
         .onClick(() => {
-          this.selectedProject = null
+          this.selectedProject = { id: -1, name : '' }
           // 这里可以添加清除选择后的逻辑
         })
 
