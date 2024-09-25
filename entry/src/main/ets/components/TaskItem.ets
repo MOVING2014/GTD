@@ -15,18 +15,7 @@ export struct TaskList {
 
 
 aboutToAppear(){
-  // this.loadTasks()
 }
-
-  // async loadTasks() {
-  //   try {
-  //     this.tasks = await this.gtdController.getAllTasks();
-  //     hilog.debug(0x009,'TaskItem',`TaskItem load tasks ${JSON.stringify(this.tasks)}`)
-  //   } catch (error) {
-  //     console.error('Failed to load tasks:', error);
-  //   }
-  // }
-
 
 
   @Builder
@@ -103,7 +92,7 @@ aboutToAppear(){
   build() {
     Column() {
       List() {
-        ForEach(this.tasks.filter(task => !task.isCompleted), (task: TaskModel, index: number) => {
+        ForEach(this.tasks, (task: TaskModel, index: number) => {
           ListItem() {
             Row() {
               Toggle({ type: ToggleType.Checkbox, isOn: task.isCompleted })
@@ -160,7 +149,7 @@ aboutToAppear(){
             .alignItems(VerticalAlign.Top) // 确保Row内容顶部对齐
           }
           .swipeAction({ end: this.itemEnd(task) })
-        }, task => task.id.toString())
+        })
       }
       .width('100%')
 
@@ -247,7 +236,7 @@ aboutToAppear(){
               .alignItems(VerticalAlign.Top) // 确保Row内容顶部对齐
             }
             .swipeAction({ end: this.itemEnd(task) })
-          }, task => task.id.toString())
+          })
         }
         .width('100%')
       }

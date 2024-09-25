@@ -42,6 +42,8 @@ export struct AddTaskComponent {
       this.flagged = this.currentEditingTask.flagged ;
       this.reminder = this.currentEditingTask.reminder;
       this.dueDateString = formatDateToChinese(this.currentEditingTask.dueDate);
+      this.selectedContext = this.gtdController.contextCache[this.currentEditingTask.contextId]
+      this.selectedProject = this.gtdController.projectCache[this.currentEditingTask.projectId]
 
       hilog.debug(0x009, 'AddTask', `currentEditingTask: ${JSON.stringify(this.currentEditingTask)}`)
       hilog.debug(0x009, 'AddTask', `currentEditingTask: ${this.projectId}`)
@@ -152,25 +154,6 @@ export struct AddTaskComponent {
   @Builder ProjectMenuBuilder() {
     Menu() {
 
-      // Column(){
-      //   Row(){
-      //     Text("无项目")
-      //       .onClick(()=>{this.selectedProject = null})
-      //
-      //   }
-      //   ForEach(Object.values(this.gtdController.projectCache), (project: ProjectModel) => {
-      //     Row(){
-      //       Text(project.name)
-      //           .onClick(() => {
-      //             this.selectedProject = project
-      //             // 这里可以添加选择 context 后的逻辑，比如更新任务的 context
-      //           })
-      //     }
-      //
-      //   })
-      //
-      //
-      // }
       MenuItem({ content: '无项目' })
         .onClick(() => {
           this.selectedProject = null
