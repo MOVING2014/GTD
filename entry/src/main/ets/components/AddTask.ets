@@ -6,7 +6,7 @@ import hilog from '@ohos.hilog';
 import { GTDController } from '../viewmodel/GTDController';
 import window from '@ohos.window';
 import display from '@ohos.display';
-// import inputMethod from '@ohos.inputMethod';
+
 
 @Component
 export struct AddTaskComponent {
@@ -315,14 +315,6 @@ export struct AddTaskComponent {
           .borderRadius(0)
           .onChange((value: string) => {
             this.title = value;
-          })
-          .defaultFocus(true)
-          .focusable(true)
-          .onFocus(() => {
-            // inputMethod.getController().showSoftKeyboard()
-          })
-          .onBlur(() => {
-            // inputMethod.getController().stopInputSession()
           })
       }
       .alignSelf(ItemAlign.Start)
