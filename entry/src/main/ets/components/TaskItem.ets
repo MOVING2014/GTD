@@ -18,6 +18,18 @@ aboutToAppear(){
 }
 
 
+  async loadTasks() {
+    try {
+      this.tasks = await this.gtdController.getAllTasks();
+      hilog.debug(0x001,'tasksload',`tasksload:  ${JSON.stringify(this.tasks)}`)
+
+
+    } catch (error) {
+      console.error('Failed to load tasks:', error);
+    }
+    this.gtdController.initializeCache()
+  }
+
   @Builder
   ProjectLabel(projectId: number) {
     if (projectId) {
@@ -64,7 +76,7 @@ aboutToAppear(){
         this.currentEditingTask = record;
         this.isPopupVisible = true;
         hilog.debug(0x009,'TaskItem',`TaskItem load tasks ${JSON.stringify(this.tasks[1])}`)
-        // this.loadTasks()
+        this.loadTasks()
       })
       .margin({right:10})
       // 侧滑后尾端出现的组件
@@ -78,10 +90,9 @@ aboutToAppear(){
       .backgroundColor(Constants.deleteButtonColor)
       .onClick(async () => {
         // this.controller.deleteMoodRecord(record.id)
-       let result =  await this.gtdController.deleteTask(record.id)
-        // this.loadTasks()
-        hilog.debug(0x001,'TaskItem',`delted result ${result}`)
-        hilog.debug(0x001,'TaskItem',`delted result ${JSON.stringify(await this.gtdController.getAllTasks())}`)
+        await this.gtdController.deleteTask(record.id)
+        this.loadTasks()
+
       })
 
     }
@@ -92,15 +103,26 @@ aboutToAppear(){
   build() {
     Column() {
       List() {
-        ForEach(this.tasks, (task: TaskModel, index: number) => {
+        ForEach(this.tasks
+         .filter(task => !task.isCompleted),
+          (task: TaskModel, index: number) => {
           ListItem() {
             Row() {
               Toggle({ type: ToggleType.Checkbox, isOn: task.isCompleted })
                 .onChange((isOn: boolean) => {
                   task.isCompleted = isOn;
                   task.modifyTime = new Date();
-                  this.gtdController.updateTask(task);
-                  // this.loadTasks()
+                  // this.gtdController.updateTask(task);
+
+                  this.gtdController.updateTask(task).then(() => {
+                    // 更新成功后的操作
+                    this.loadTasks();
+                    console.info('Task updated successfully');
+                  }).catch(error => {
+                    // 错误处理
+                    console.error('Failed to update task:', error);
+                  });
+
                 })
                 .margin({ right: 10 })
                 .alignSelf(ItemAlign.Start) // 确保复选框顶部对齐
@@ -149,7 +171,9 @@ aboutToAppear(){
             .alignItems(VerticalAlign.Top) // 确保Row内容顶部对齐
           }
           .swipeAction({ end: this.itemEnd(task) })
-        })
+        }
+        // , (task: TaskModel ,index:number) => {return index + '_' +  task.isCompleted.toString();}
+        )
       }
       .width('100%')
 
@@ -187,8 +211,16 @@ aboutToAppear(){
                 Toggle({ type: ToggleType.Checkbox, isOn: task.isCompleted })
                   .onChange((isOn: boolean) => {
                     task.isCompleted = isOn;
-                    this.gtdController.updateTask(task);
-                    // this.loadTasks()
+
+                    this.gtdController.updateTask(task).then(() => {
+                      // 更新成功后的操作
+                      this.loadTasks();
+                      console.info('Task updated successfully');
+                    }).catch(error => {
+                      // 错误处理
+                      console.error('Failed to update task:', error);
+                    });
+
                   })
                   .margin({ right: 10 })
                   .alignSelf(ItemAlign.Start) // 确保复选框顶部对齐

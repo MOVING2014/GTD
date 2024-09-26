@@ -6,6 +6,9 @@ import hilog from '@ohos.hilog';
 import { GTDController } from '../viewmodel/GTDController';
 import window from '@ohos.window';
 import display from '@ohos.display';
+import inputMethod from '@ohos.inputMethod';
+
+
 
 
 @Component
@@ -36,6 +39,15 @@ export struct AddTaskComponent {
 
   onConfirm: (task: TaskModel, isUpdate: boolean) => void;
   onCancel: () => void;
+
+  // 显示键盘
+  private showKeyboard() {
+    inputMethod.getController().showSoftKeyboard().then(() => {
+      console.log("show keyboard success")
+    }).catch((error) => {
+      console.log("show keyboard failure: " + `${JSON.stringify(error)}`)
+    })
+  }
 
 
   private addKeyboardHeightListener() {
@@ -72,7 +84,7 @@ export struct AddTaskComponent {
       // 这里我们设置最大抬高高度为屏幕高度的一半
       const maxElevation = screenHeight / 2;
       this.componentElevation = Math.min(height, maxElevation);
-      this.componentElevation = 40
+      this.componentElevation = 50
 
     } catch (exception) {
       console.error('Failed to obtain the default display object. Code: ' + JSON.stringify(exception));
@@ -284,59 +296,53 @@ export struct AddTaskComponent {
 
   private showDatePicker() {
     let currentDate = new Date()
-    DatePickerDialog.show({
-      start: new Date(),
-      end: new Date('2100-12-31'),
-      selected: currentDate,
-      onAccept: (value: DatePickerResult) => {
-        let newDate = new Date(value.year, value.month, value.day);
-        // this.dueDateString = formatDateToChinese(newDate);
-        this.dueDateString = formatDateToChinese(newDate) // 这里面不能赋值给任何 @State 类变量
-        hilog.debug(0x001, 'AddTask',`dueDateString: ${this.dueDateString}, this.dueDate: ${newDate.toString()}`)
-      },
-      onCancel: () => {
-        this.dueDateString = '';
-        console.info('DatePicker canceled')
-      }
-    })
+
+      DatePickerDialog.show({
+        start: new Date(),
+        end: new Date('2100-12-31'),
+        selected: currentDate,
+        onAccept: (value: DatePickerResult) => {
+          let newDate = new Date(value.year, value.month, value.day);
+          // this.dueDateString = formatDateToChinese(newDate);
+          this.dueDateString = formatDateToChinese(newDate) // 这里面不能赋值给任何 @State 类变量
+          hilog.debug(0x001, 'AddTask', `dueDateString: ${this.dueDateString}, this.dueDate: ${newDate.toString()}`)
+        },
+        onCancel: () => {
+          this.dueDateString = '';
+          console.info('DatePicker canceled')
+        }
+      })
+
 
   }
 
   build() {
     Column() {
 
+      // Divider()
+      //   // .strokeWidth(0.5)
+      //   .margin({top:10, bottom:10})
+
       Row() {
         TextInput({
           placeholder: '准备做什么？',
           text: this.title
         })
+          .defaultFocus(true)
           .width('100%')
           .height(40)
           .borderRadius(0)
           .onChange((value: string) => {
             this.title = value;
           })
-      }
-      .alignSelf(ItemAlign.Start)
-
-
-
-      Row() {
-        TextInput({
-          placeholder: '描述？',
-          text: this.description
-        })
-          .width('100%')
-          .height(40)
-          .borderRadius(0)
-          .fontColor(Color.Gray)
-          .onChange((value: string) => {
-            this.description = value;
+          .key('123')
+          .onAppear(()=>{
+            sendEventByKey('123',10,'弹出键盘')
           })
+
       }
       .alignSelf(ItemAlign.Start)
-
-
+      .margin({bottom:10})
 
       Row() {
         // 1. 日期时间
@@ -354,11 +360,30 @@ export struct AddTaskComponent {
       }
       .width('100%')
       .justifyContent(FlexAlign.SpaceAround)
-      .margin({top:10})
+      .margin({top:10, bottom:10 })
 
-      Divider()
-        .strokeWidth(0.5)
-        .margin({top:10, bottom:10})
+
+      //
+      // Row() {
+      //   TextInput({
+      //     placeholder: '描述？',
+      //     text: this.description
+      //   })
+      //     .width('100%')
+      //     .height(40)
+      //     .borderRadius(0)
+      //     .fontColor(Color.Gray)
+      //     .onChange((value: string) => {
+      //       this.description = value;
+      //     })
+      // }
+      // .alignSelf(ItemAlign.Start)
+
+
+
+      // Divider()
+      //   // .strokeWidth(0.5)
+      //   .margin({top:10, bottom:100})
     }
     .width('100%')
     .padding(10)

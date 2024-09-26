@@ -5,11 +5,13 @@ import { AddTaskComponent } from '../components/AddTask';
 import promptAction from '@ohos.promptAction';
 import hilog from '@ohos.hilog';
 import inputMethod from '@ohos.inputMethod';
+import { DatabaseGTDDataSource } from '../data/DatabaseGTDDataSource';
 
 @Entry
 @Component
 struct Index {
-  @Provide gtdController: GTDController = new GTDController();
+  // @Provide gtdController: GTDController = new GTDController();
+  @Provide gtdController: GTDController = new GTDController(new DatabaseGTDDataSource());
   @Provide currentEditingTask: TaskModel | {id:-1, name:'', createdDate:Date, isCompleted:boolean } = {id:-1, name:'', createdDate:new Date(0), isCompleted:false};
   @Provide isPopupVisible: boolean = false;
 
@@ -127,10 +129,10 @@ struct Index {
                   const updatedTask = await this.gtdController.updateTask(record);
                   hilog.debug(0x009,'indexPage',`record: ${JSON.stringify(record)}`)
                   hilog.debug(0x009,'indexPage',`${JSON.stringify(updatedTask)}`)
-                  promptAction.showToast({ message: '更新成功', duration: 2000 });
+                  // promptAction.showToast({ message: '更新成功', duration: 2000 });
                 } else {
                   await this.gtdController.createTask(record);
-                  promptAction.showToast({ message: '添加成功', duration: 2000 });
+                  // promptAction.showToast({ message: '添加成功', duration: 2000 });
                 }
 
                 // await this.gtdController.createTask(record);
@@ -165,6 +167,7 @@ struct Index {
           }
 
         }
+
       }
       .tabBar(this.TabBuilder("日历", 0, "📅"))
 
@@ -203,5 +206,6 @@ struct Index {
     .onChange((index: number) => {
       this.currentIndex = index;
     })
+
   }
 }
