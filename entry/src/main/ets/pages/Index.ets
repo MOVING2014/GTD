@@ -4,6 +4,7 @@ import {  TaskList } from '../components/TaskItem'
 import { AddTaskComponent } from '../components/AddTask';
 import promptAction from '@ohos.promptAction';
 import hilog from '@ohos.hilog';
+import inputMethod from '@ohos.inputMethod';
 
 @Entry
 @Component
@@ -17,6 +18,21 @@ struct Index {
   @State tasks: TaskModel[] = [];
 
   @State popupTranslateY: number = 100;
+
+
+
+  // private showInputMethod() {
+  //   inputMethod.getController().showSoftKeyboard().then(() => {
+  //     console.log('Succeeded in showing softKeyboard.');
+  //   }).catch((err) => {
+  //     console.error('Failed to showSoftKeyboard: ' + JSON.stringify(err));
+  //   });
+  //
+  // }
+  //
+  // private hideInputMethod() {
+  //   inputMethod.getController().hideSoftKeyboard()
+  // }
 
 
   aboutToAppear() {
@@ -43,7 +59,9 @@ struct Index {
     animateTo({ duration: 200 }, () => {
       // this.popupOpacity = 1;
       this.popupTranslateY = 0;
+      // this.showInputMethod()
     });
+
   }
 
   hidePopup() {
@@ -103,6 +121,7 @@ struct Index {
 
             AddTaskComponent({
 
+              context: getContext(this),
               onConfirm: async (record: TaskModel, isUpdate: boolean) => {
                 if (isUpdate) {
                   const updatedTask = await this.gtdController.updateTask(record);

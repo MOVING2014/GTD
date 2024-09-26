@@ -4,9 +4,17 @@ import { formatDateToChinese, parseDate } from '../common/utils';
 import { Constants } from '../common/Constants';
 import hilog from '@ohos.hilog';
 import { GTDController } from '../viewmodel/GTDController';
+import window from '@ohos.window';
+import display from '@ohos.display';
+// import inputMethod from '@ohos.inputMethod';
 
 @Component
 export struct AddTaskComponent {
+  private context: Context;
+  @State keyboardHeight: number = 0;
+  @State componentElevation: number = 0;
+
+
   @State title: string = '';
   @State description: string = '';
   // @State dueDate: Date |undefined = undefined; //@State 不能修饰Date变量
@@ -29,6 +37,50 @@ export struct AddTaskComponent {
   onConfirm: (task: TaskModel, isUpdate: boolean) => void;
   onCancel: () => void;
 
+
+  private addKeyboardHeightListener() {
+    window.getLastWindow(this.context, (err, windowClass) => {
+      if (err.code) {
+        console.error('Failed to obtain the top window. Cause: ' + JSON.stringify(err));
+        return;
+      }
+      windowClass.on('keyboardHeightChange', this.onKeyboardHeightChange.bind(this));
+    });
+  }
+
+  private removeKeyboardHeightListener() {
+    window.getLastWindow(this.context, (err, windowClass) => {
+      if (err.code) {
+        console.error('Failed to obtain the top window. Cause: ' + JSON.stringify(err));
+        return;
+      }
+      windowClass.off('keyboardHeightChange');
+    });
+  }
+
+  private onKeyboardHeightChange(height: number) {
+    this.keyboardHeight = height;
+    console.log(`Keyboard height changed to: ${height}`);
+
+      // 获取屏幕高度
+
+    try {
+      const displayClass = display.getDefaultDisplaySync();
+      const screenHeight = px2vp(displayClass.height);
+
+      // 计算组件应该抬高的高度
+      // 这里我们设置最大抬高高度为屏幕高度的一半
+      const maxElevation = screenHeight / 2;
+      this.componentElevation = Math.min(height, maxElevation);
+      this.componentElevation = 40
+
+    } catch (exception) {
+      console.error('Failed to obtain the default display object. Code: ' + JSON.stringify(exception));
+    }
+
+
+  }
+
   aboutToAppear() {
     if (this.currentEditingTask.id != -1) {
       // 编辑模式：使用当前编辑的任务填充状态
@@ -48,6 +100,8 @@ export struct AddTaskComponent {
       hilog.debug(0x009, 'AddTask', `currentEditingTask: ${JSON.stringify(this.currentEditingTask)}`)
       hilog.debug(0x009, 'AddTask', `currentEditingTask: ${this.projectId}`)
     }
+    this.addKeyboardHeightListener();
+
   }
 
   @Builder DateSelector() {
@@ -262,6 +316,14 @@ export struct AddTaskComponent {
           .onChange((value: string) => {
             this.title = value;
           })
+          .defaultFocus(true)
+          .focusable(true)
+          .onFocus(() => {
+            // inputMethod.getController().showSoftKeyboard()
+          })
+          .onBlur(() => {
+            // inputMethod.getController().stopInputSession()
+          })
       }
       .alignSelf(ItemAlign.Start)
 
@@ -309,6 +371,9 @@ export struct AddTaskComponent {
     .width('100%')
     .padding(10)
     .backgroundColor(Color.White)
+    .margin({bottom:this.componentElevation})
+
+
 
   }
 }

@@ -16,6 +16,18 @@
       "name": "app_name",
       "value": "GTD"
 
+    },
+    {
+      "name": "read_media_reason",
+      "value": "需要读取文件权限以访问和处理文件"
+    },
+    {
+      "name": "write_media_reason",
+      "value": "需要写入文件权限以保存处理后的数据"
+    },
+    {
+      "name": "connect_ime_reason",
+      "value": "需要此权限以便与输入法服务进行交互，提供更好的输入体验。"
     }
   ]
 }
