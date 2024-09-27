@@ -20,6 +20,21 @@ export default class EntryAbility extends UIAbility {
         hilog.error(0x0000, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
         return;
       }
+      // 设置窗口模式
+      // 设置窗口模式
+      // let windowClass = windowClass;
+      // try {
+      //   windowClass.setWindowLayoutFullScreen(true);
+      //   windowClass.setWindowSystemBarEnable(['status', 'navigation']);
+      //   windowClass.setWindowSystemBarProperties({
+      //     navigationBarColor: '#FFFFFF',
+      //     statusBarColor: '#FFFFFF',
+      //     navigationBarContentColor: '#000000',
+      //     statusBarContentColor: '#000000',
+      //   });
+      // } catch (err) {
+      //   console.error('Failed to set the window properties. Cause: ' + JSON.stringify(err));
+      // }
       hilog.info(0x0000, 'testTag', 'Succeeded in loading the content. Data: %{public}s', JSON.stringify(data) ?? '');
     });
   }

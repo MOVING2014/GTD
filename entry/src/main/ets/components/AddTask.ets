@@ -40,14 +40,6 @@ export struct AddTaskComponent {
   onConfirm: (task: TaskModel, isUpdate: boolean) => void;
   onCancel: () => void;
 
-  // 显示键盘
-  private showKeyboard() {
-    inputMethod.getController().showSoftKeyboard().then(() => {
-      console.log("show keyboard success")
-    }).catch((error) => {
-      console.log("show keyboard failure: " + `${JSON.stringify(error)}`)
-    })
-  }
 
 
   private addKeyboardHeightListener() {
@@ -388,7 +380,8 @@ export struct AddTaskComponent {
     .width('100%')
     .padding(10)
     .backgroundColor(Color.White)
-    .margin({bottom:this.componentElevation})
+    // .margin({bottom:this.componentElevation})
+    // .margin({bottom:-55})
 
 
 
