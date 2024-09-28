@@ -35,6 +35,7 @@ struct Index {
 
   @State private isAddingProject: boolean = false;
   @State private newProjectName: string = '';
+  @State private newProjectDescription: string = '';
 
 
 
@@ -92,9 +93,10 @@ struct Index {
 
   showPopup() {
     this.isPopupVisible = true;
-    animateTo({ duration: 100 }, () => {
+    animateTo({ duration: 400, curve: Curve.EaseInOut }, () => {
       // this.popupOpacity = 1;
       this.popupTranslateY = 0;
+
       // this.showInputMethod()
     });
 
@@ -130,6 +132,7 @@ struct Index {
         const newProject: ProjectModel = {
           id: Date.now(), // 临时使用时间戳作为ID，实际应该由后端生成
           name: this.newProjectName.trim(),
+          description: this.newProjectDescription.trim(),
           isExpended: false, // 新创建的项目默认不展开
           taskIds: [] // 新项目默认没有任务
         };
@@ -211,21 +214,33 @@ struct Index {
             .padding({ left: 16, right: 16 })
 
             if (this.isAddingProject) {
-              Row() {
+              Column() {
                 TextInput({ placeholder: '新项目名称' })
-                  .width('70%')
+                  .width('100%')
                   .height(40)
                   .onChange((value: string) => {
                     this.newProjectName = value;
                   })
-                Button('添加')
-                  .onClick(() => {
-                    this.createNewProject();
+                  .margin({bottom:3})
+                TextInput({ placeholder: '备注/项目目标？' })
+                  .width('100%')
+                  .height(40)
+                  .onChange((value: string) => {
+                    this.newProjectDescription = value;
                   })
-                Button('取消')
-                  .onClick(() => {
-                    this.isAddingProject = false;
-                  })
+                  .margin({bottom:3})
+                Row(){
+                  Button('取消')
+                    .onClick(() => {
+                      this.isAddingProject = false;
+                    })
+                  Button('添加')
+                    .onClick(() => {
+                      this.createNewProject();
+                    })
+                }.justifyContent(FlexAlign.SpaceBetween)
+                .width('60%')
+
               }
               .width('100%')
               .padding(16)
@@ -292,30 +307,19 @@ struct Index {
           .onAppear(() => this.showPopup())
           .onClick(() => this.hidePopup())
 
-        // Column()
-        //   .width('100%')
-        //   .height(56)
-        //   .margin({bottom:-3})
-
-
 
         AddTaskComponent({
-
           context: getContext(this),
           onConfirm: async (record: TaskModel, isUpdate: boolean) => {
             if (isUpdate) {
               const updatedTask = await this.gtdController.updateTask(record);
               hilog.debug(0x009, 'indexPage', `record: ${JSON.stringify(record)}`)
               hilog.debug(0x009, 'indexPage', `${JSON.stringify(updatedTask)}`)
-              // promptAction.showToast({ message: '更新成功', duration: 2000 });
             } else {
               await this.gtdController.createTask(record);
-              // promptAction.showToast({ message: '添加成功', duration: 2000 });
             }
 
-            // await this.gtdController.createTask(record);
             this.loadTasks();
-            // hilog.debug(0x001,'index',`${JSON.stringify(this.tasks)}`)
             this.hidePopup();
             hilog.debug(0x009, 'indexPage', `tasksload:  ${JSON.stringify(this.tasks[1])}`)
 
@@ -325,6 +329,8 @@ struct Index {
           }
         })
           .translate({ y: this.popupTranslateY })
+          .position({y:440}) // TODO: 需要搞清楚为什么是440
+
       }
 
 
@@ -347,8 +353,8 @@ struct Index {
 
     }
     .width('100%')
-    .height(this.StackHeight)
-    .margin({top:this.topMargin})
+    // .height(this.StackHeight)
+    // .margin({top:this.topMargin})
 
   }
 }

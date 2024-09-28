@@ -61,13 +61,24 @@ export  struct ProjectView {
 
       }
       .width('100%')
-      .height(50)
+      // .height(50)
       .backgroundColor(Color.White)
       .padding({ left: 0, right: 16 })
       .onClick(() => {
         project.isExpended = !project.isExpended
         this.projects = [...this.projects]
       })
+      if(project.description) {
+        Row() {
+          Text(project.description)
+            .fontSize(16)
+            .fontWeight(FontWeight.Regular)
+            .fontColor(Color.Grey)
+            .margin({left:40, bottom:10})
+          Blank()
+
+        } .width('100%')
+      }
 
       if (project.isExpended) {
         if (project.taskIds) {

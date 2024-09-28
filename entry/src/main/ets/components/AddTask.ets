@@ -330,6 +330,7 @@ export struct AddTaskComponent {
           .key('123')
           .onAppear(()=>{
             sendEventByKey('123',10,'弹出键盘')
+            sendEventByKey('123',10,'弹出键盘')
           })
 
       }
