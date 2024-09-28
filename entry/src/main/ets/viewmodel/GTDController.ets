@@ -83,18 +83,43 @@ export class GTDController {
 
   async createTask(task: Omit<TaskModel, 'id'>): Promise<TaskModel> {
     const newTask: TaskModel = { ...task, id: 0 };
+
+    const taskReturn = await this.dataSource.addTask(newTask);
+    // if (taskReturn.projectId) {
+    //   await this.updateProjectTasks(taskReturn.projectId, taskReturn.id, true);
+    //   await this.initializeCache()
+    // }
+
     this.notifyObservers()
-    return this.dataSource.addTask(newTask);
+    return  taskReturn
   }
 
   async updateTask(task: TaskModel): Promise<TaskModel> {
+    const taskReturn = await this.dataSource.updateTask(task);
     this.notifyObservers()
-    return this.dataSource.updateTask(task);
+    return taskReturn
+  }
+
+  private async updateProjectTasks(projectId: number, taskId: number, isAdd: boolean) {
+    const project = await this.getProjectById(projectId);
+    if (!project.taskIds) {
+      project.taskIds = [];
+    }
+
+    if (isAdd) {
+      project.taskIds.push(taskId);
+    } else {
+      project.taskIds = project.taskIds.filter(id => id !== taskId);
+    }
+
+    await this.updateProject(project);
   }
 
   async deleteTask(taskId: number): Promise<boolean> {
+    // this.notifyObservers()
+    const taskReturn = this.dataSource.deleteTask(taskId);
     this.notifyObservers()
-    return this.dataSource.deleteTask(taskId);
+    return taskReturn
   }
 
   async getTasksByProject(projectId: number): Promise<TaskModel[]> {
