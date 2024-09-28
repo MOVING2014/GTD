@@ -248,6 +248,7 @@ export class DatabaseGTDDataSource implements GTDDataSource {
     return {
       name: project.name,
       description: project.description,
+      isExpended: project.isExpended ? 1:0
     };
   }
 

@@ -15,8 +15,8 @@ import { ProjectView } from '../components/ProjectView';
 @Entry
 @Component
 struct Index {
-  @Provide gtdController: GTDController = new GTDController(new MockGTDDataSource);
-  // @Provide gtdController: GTDController = new GTDController(new DatabaseGTDDataSource());
+  // @Provide gtdController: GTDController = new GTDController(new MockGTDDataSource);
+  @Provide gtdController: GTDController = new GTDController(new DatabaseGTDDataSource());
   @Provide currentEditingTask: TaskModel | {id:-1, name:'', createdDate:Date, isCompleted:boolean } = {id:-1, name:'', createdDate:new Date(0), isCompleted:false};
   @Provide isPopupVisible: boolean = false;
 

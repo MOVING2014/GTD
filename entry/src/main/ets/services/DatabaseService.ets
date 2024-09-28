@@ -54,7 +54,8 @@ export class DatabaseService {
       const SQL_CREATE_PROJECTS =`CREATE TABLE IF NOT EXISTS Projects (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           name TEXT NOT NULL,
-          description TEXT
+          description TEXT,
+          isExpended INTEGER
       )`;
       await this.rdbStore.executeSql(SQL_CREATE_PROJECTS);
 
