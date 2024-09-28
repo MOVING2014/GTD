@@ -1,4 +1,5 @@
 import hilog from '@ohos.hilog';
+import { TaskItem } from '../common/CommonBuilders';
 import { Constants } from '../common/Constants';
 import { formatDateToChinese, overDue } from '../common/utils';
 import { ProjectModel, TaskModel } from '../models/IModels';
@@ -107,68 +108,75 @@ aboutToAppear(){
          .filter(task => !task.isCompleted),
           (task: TaskModel, index: number) => {
           ListItem() {
-            Row() {
-              Toggle({ type: ToggleType.Checkbox, isOn: task.isCompleted })
-                .onChange((isOn: boolean) => {
-                  task.isCompleted = isOn;
-                  task.modifyTime = new Date();
-                  // this.gtdController.updateTask(task);
 
-                  this.gtdController.updateTask(task).then(() => {
-                    // 更新成功后的操作
-                    this.loadTasks();
-                    console.info('Task updated successfully');
-                  }).catch(error => {
-                    // 错误处理
-                    console.error('Failed to update task:', error);
-                  });
-
-                })
-                .margin({ right: 10 })
-                .alignSelf(ItemAlign.Start) // 确保复选框顶部对齐
-
-              Column() {
-                Text(task.title)
-                  .fontSize(18)
-                  .fontColor(task.isCompleted ? '#888888' : '#000000')
-                  .fontWeight(FontWeight.Bold)
-                  .decoration({ type: task.isCompleted ? TextDecorationType.LineThrough : TextDecorationType.None })
-                    // .fontColor(this.tasks[index].isCompleted ? '#888888' : '#000000')
-                    // .decoration({ type: this.tasks[index].isCompleted ? TextDecorationType.LineThrough : TextDecorationType.None })
-                  .width('85%')
-                  .alignSelf(ItemAlign.Start)
-
-                Row() {
-                  if (task.projectId) {
-                    this.ProjectLabel(task.projectId)
-
-                  }
-
-                  if (task.contextId) {
-                    this.ContextLabel(task.contextId)
-
-                  }
-
-                  if (task.dueDate) {
-
-                    Text(formatDateToChinese(task.dueDate, false))
-                      .fontSize(16)
-                      .fontColor(overDue(task.dueDate) ? '#FF0000' : '#888888')
-                      .margin({ top: 5 }) // 为日期添加一些顶部边距
-                  }
-
-
-                }
-
-              }
-              .alignItems(HorizontalAlign.Start) // 确保文本左对齐
-            }
-            .width('100%')
-            .padding(10)
-            .borderRadius(8)
-            .backgroundColor(Color.White)
-            .margin({ bottom: 10 })
-            .alignItems(VerticalAlign.Top) // 确保Row内容顶部对齐
+            TaskItem(task, this.gtdController, () => this.loadTasks())
+            // Row() {
+            //   Toggle({ type: ToggleType.Checkbox, isOn: task.isCompleted })
+            //     .onChange((isOn: boolean) => {
+            //       task.isCompleted = isOn;
+            //       task.modifyTime = new Date();
+            //       // this.gtdController.updateTask(task);
+            //
+            //       this.gtdController.updateTask(task).then(() => {
+            //         // 更新成功后的操作
+            //         this.loadTasks();
+            //         console.info('Task updated successfully');
+            //       }).catch(error => {
+            //         // 错误处理
+            //         console.error('Failed to update task:', error);
+            //       });
+            //
+            //     })
+            //     .margin({ right: 10 })
+            //     .alignSelf(ItemAlign.Start) // 确保复选框顶部对齐
+            //
+            //
+            //
+            //
+            //
+            //
+            //   Column() {
+            //     Text(task.title)
+            //       .fontSize(18)
+            //       .fontColor(task.isCompleted ? '#888888' : '#000000')
+            //       .fontWeight(FontWeight.Bold)
+            //       .decoration({ type: task.isCompleted ? TextDecorationType.LineThrough : TextDecorationType.None })
+            //         // .fontColor(this.tasks[index].isCompleted ? '#888888' : '#000000')
+            //         // .decoration({ type: this.tasks[index].isCompleted ? TextDecorationType.LineThrough : TextDecorationType.None })
+            //       .width('85%')
+            //       .alignSelf(ItemAlign.Start)
+            //
+            //     Row() {
+            //       if (task.projectId) {
+            //         this.ProjectLabel(task.projectId)
+            //
+            //       }
+            //
+            //       if (task.contextId) {
+            //         this.ContextLabel(task.contextId)
+            //
+            //       }
+            //
+            //       if (task.dueDate) {
+            //
+            //         Text(formatDateToChinese(task.dueDate, false))
+            //           .fontSize(16)
+            //           .fontColor(overDue(task.dueDate) ? '#FF0000' : '#888888')
+            //           .margin({ top: 5 }) // 为日期添加一些顶部边距
+            //       }
+            //
+            //
+            //     }
+            //
+            //   }
+            //   .alignItems(HorizontalAlign.Start) // 确保文本左对齐
+            // }
+            // .width('100%')
+            // .padding(10)
+            // .borderRadius(8)
+            // .backgroundColor(Color.White)
+            // .margin({ bottom: 10 })
+            // .alignItems(VerticalAlign.Top) // 确保Row内容顶部对齐
           }
           .swipeAction({ end: this.itemEnd(task) })
         }
@@ -207,65 +215,67 @@ aboutToAppear(){
              .sort((a, b) => new Date(b.modifyTime).getTime() - new Date(a.modifyTime).getTime()),
             (task: TaskModel, index: number) => {
             ListItem() {
-              Row() {
-                Toggle({ type: ToggleType.Checkbox, isOn: task.isCompleted })
-                  .onChange((isOn: boolean) => {
-                    task.isCompleted = isOn;
 
-                    this.gtdController.updateTask(task).then(() => {
-                      // 更新成功后的操作
-                      this.loadTasks();
-                      console.info('Task updated successfully');
-                    }).catch(error => {
-                      // 错误处理
-                      console.error('Failed to update task:', error);
-                    });
-
-                  })
-                  .margin({ right: 10 })
-                  .alignSelf(ItemAlign.Start) // 确保复选框顶部对齐
-
-                Column() {
-                  Text(task.title)
-                    .fontSize(18)
-                    .fontColor(task.isCompleted ? '#888888' : '#000000')
-                    .decoration({ type: task.isCompleted ? TextDecorationType.LineThrough : TextDecorationType.None })
-                      // .fontColor(this.tasks[index].isCompleted ? '#888888' : '#000000')
-                      // .decoration({ type: this.tasks[index].isCompleted ? TextDecorationType.LineThrough : TextDecorationType.None })
-                    .width('85%')
-                    .alignSelf(ItemAlign.Start)
-
-                  Row() {
-                    if (task.projectId) {
-                      this.ProjectLabel(task.projectId)
-
-                    }
-
-                    if (task.contextId) {
-                      this.ContextLabel(task.contextId)
-
-                    }
-
-                    if (task.dueDate) {
-
-                      Text(formatDateToChinese(task.dueDate, false))
-                        .fontSize(16)
-                        .fontColor(overDue(task.dueDate) ? '#FF0000' : '#888888')
-                        .margin({ top: 5 }) // 为日期添加一些顶部边距
-                    }
-
-
-                  }
-
-                }
-                .alignItems(HorizontalAlign.Start) // 确保文本左对齐
-              }
-              .width('100%')
-              .padding(10)
-              .borderRadius(8)
-              .backgroundColor(Color.White)
-              .margin({ bottom: 10 })
-              .alignItems(VerticalAlign.Top) // 确保Row内容顶部对齐
+              TaskItem(task, this.gtdController, () => this.loadTasks())
+              // Row() {
+              //   Toggle({ type: ToggleType.Checkbox, isOn: task.isCompleted })
+              //     .onChange((isOn: boolean) => {
+              //       task.isCompleted = isOn;
+              //
+              //       this.gtdController.updateTask(task).then(() => {
+              //         // 更新成功后的操作
+              //         this.loadTasks();
+              //         console.info('Task updated successfully');
+              //       }).catch(error => {
+              //         // 错误处理
+              //         console.error('Failed to update task:', error);
+              //       });
+              //
+              //     })
+              //     .margin({ right: 10 })
+              //     .alignSelf(ItemAlign.Start) // 确保复选框顶部对齐
+              //
+              //   Column() {
+              //     Text(task.title)
+              //       .fontSize(18)
+              //       .fontColor(task.isCompleted ? '#888888' : '#000000')
+              //       .decoration({ type: task.isCompleted ? TextDecorationType.LineThrough : TextDecorationType.None })
+              //         // .fontColor(this.tasks[index].isCompleted ? '#888888' : '#000000')
+              //         // .decoration({ type: this.tasks[index].isCompleted ? TextDecorationType.LineThrough : TextDecorationType.None })
+              //       .width('85%')
+              //       .alignSelf(ItemAlign.Start)
+              //
+              //     Row() {
+              //       if (task.projectId) {
+              //         this.ProjectLabel(task.projectId)
+              //
+              //       }
+              //
+              //       if (task.contextId) {
+              //         this.ContextLabel(task.contextId)
+              //
+              //       }
+              //
+              //       if (task.dueDate) {
+              //
+              //         Text(formatDateToChinese(task.dueDate, false))
+              //           .fontSize(16)
+              //           .fontColor(overDue(task.dueDate) ? '#FF0000' : '#888888')
+              //           .margin({ top: 5 }) // 为日期添加一些顶部边距
+              //       }
+              //
+              //
+              //     }
+              //
+              //   }
+              //   .alignItems(HorizontalAlign.Start) // 确保文本左对齐
+              // }
+              // .width('100%')
+              // .padding(10)
+              // .borderRadius(8)
+              // .backgroundColor(Color.White)
+              // .margin({ bottom: 10 })
+              // .alignItems(VerticalAlign.Top) // 确保Row内容顶部对齐
             }
             .swipeAction({ end: this.itemEnd(task) })
           })
@@ -276,3 +286,6 @@ aboutToAppear(){
 
   }
 }
+
+
+

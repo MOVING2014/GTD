@@ -8,6 +8,7 @@ import inputMethod from '@ohos.inputMethod';
 import { DatabaseGTDDataSource } from '../data/DatabaseGTDDataSource';
 import window from '@ohos.window';
 import display from '@ohos.display';
+import { FlaggedItem } from '../components/FlaggedItem';
 
 @Entry
 @Component
@@ -135,7 +136,6 @@ struct Index {
           .width('95%')
           .layoutWeight(1)
           .height('100%')
-
           .alignItems(HorizontalAlign.Start) // 添加这一行
 
 
@@ -168,9 +168,24 @@ struct Index {
 
         TabContent() {
           // Flagged页面内容
-          Text("Flagged")
-            .fontSize(50)
-            .fontWeight(FontWeight.Bold)
+          Column() {
+
+            Text("星标")
+              .fontSize(24)
+              .fontWeight(FontWeight.Medium)
+              .padding({ top: 20, bottom: 10 })
+
+            FlaggedItem({
+              tasks: $tasks
+            })
+
+
+          }
+          .width('95%')
+          .layoutWeight(1)
+          .height('100%')
+          .alignItems(HorizontalAlign.Start) // 添加这一行
+
         }
         .tabBar(this.TabBuilder("Flagged", 4, "🚩"))
       }
