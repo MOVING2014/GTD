@@ -1,4 +1,4 @@
-import { TaskModel } from '../models/IModels';
+import { ProjectModel, TaskModel } from '../models/IModels';
 import { GTDController } from '../viewmodel/GTDController';
 import {  TaskList } from '../components/TaskItem'
 import { AddTaskComponent } from '../components/AddTask';
@@ -10,7 +10,7 @@ import window from '@ohos.window';
 import display from '@ohos.display';
 import { FlaggedItem } from '../components/FlaggedItem';
 import { MockGTDDataSource } from '../data/MockGTDDataSource';
-import { ProjectView } from '../components/AddProject';
+import { ProjectView } from '../components/ProjectView';
 
 @Entry
 @Component
@@ -23,6 +23,7 @@ struct Index {
   private tabsController: TabsController = new TabsController();
   @State currentIndex: number = 0;
   @State tasks: TaskModel[] = [];
+  @State projects: ProjectModel[] = [];
 
   @State popupTranslateY: number = 100;
 
@@ -31,6 +32,9 @@ struct Index {
   @State StackHeight: number = 0;
   @State keyBoardHeight: number = 0;
   @State topMargin: number = 0;
+
+  @State private isAddingProject: boolean = false;
+  @State private newProjectName: string = '';
 
 
 
@@ -76,9 +80,11 @@ struct Index {
       hilog.debug(0x001,'tasksload',`tasksload:  ${JSON.stringify(this.tasks)}`)
 
 
+
     } catch (error) {
       console.error('Failed to load tasks:', error);
     }
+    this.projects = await this.gtdController.getAllProjects()
     await this.gtdController.initializeCache()
   }
 
@@ -117,6 +123,28 @@ struct Index {
     .height(50)
     .justifyContent(FlexAlign.Center)
   }
+
+  async createNewProject() {
+    if (this.newProjectName.trim()) {
+      try {
+        const newProject: ProjectModel = {
+          id: Date.now(), // 临时使用时间戳作为ID，实际应该由后端生成
+          name: this.newProjectName.trim(),
+          isExpended: false, // 新创建的项目默认不展开
+          taskIds: [] // 新项目默认没有任务
+        };
+        const createdProject = await this.gtdController.createProject(newProject);
+        this.projects = await this.gtdController.getAllProjects()
+
+        this.isAddingProject = false;
+      } catch (error) {
+        console.error('Failed to create project:', error);
+        // 可以在这里添加错误处理，比如显示一个提示
+      }
+    }
+  }
+
+
 
   build() {
     Stack({ alignContent: Alignment.BottomEnd }) {
@@ -157,13 +185,56 @@ struct Index {
           // 项目页面内容
 
           Column() {
+            Row() {
+              Text('项目')
+                .fontSize(24)
+                .fontWeight(FontWeight.Bold)
+                .margin({ left: 16 })
 
-            Text("项目")
-              .fontSize(24)
-              .fontWeight(FontWeight.Medium)
-              .padding({ top: 20, bottom: 10 })
+              Blank()  // 用于将按钮推到右边
 
-            ProjectView({})
+              Button({ type: ButtonType.Circle, stateEffect: true }) {
+                Text('+++')
+                  .width(24)
+                  .height(24)
+              }
+              .width(40)
+              .height(40)
+              .margin({ right: 16 })
+              .onClick(() => {
+                this.isAddingProject = true
+              })
+            }
+            .width('100%')
+            .height(60)
+            .backgroundColor('#F5F5F5')
+            .padding({ left: 16, right: 16 })
+
+            if (this.isAddingProject) {
+              Row() {
+                TextInput({ placeholder: '新项目名称' })
+                  .width('70%')
+                  .height(40)
+                  .onChange((value: string) => {
+                    this.newProjectName = value;
+                  })
+                Button('添加')
+                  .onClick(() => {
+                    this.createNewProject();
+                  })
+                Button('取消')
+                  .onClick(() => {
+                    this.isAddingProject = false;
+                  })
+              }
+              .width('100%')
+              .padding(16)
+              .backgroundColor(Color.White)
+            }
+
+            ProjectView({
+              projects:$projects
+            })
 
 
           }
@@ -257,7 +328,6 @@ struct Index {
       }
 
 
-
       if (!this.isPopupVisible) {
         Button({ type: ButtonType.Capsule, stateEffect: true }) {
           Text("+")
@@ -274,9 +344,6 @@ struct Index {
           this.showPopup()
         })
       }
-
-
-
 
     }
     .width('100%')
