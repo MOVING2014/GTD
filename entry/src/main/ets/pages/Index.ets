@@ -9,12 +9,14 @@ import { DatabaseGTDDataSource } from '../data/DatabaseGTDDataSource';
 import window from '@ohos.window';
 import display from '@ohos.display';
 import { FlaggedItem } from '../components/FlaggedItem';
+import { MockGTDDataSource } from '../data/MockGTDDataSource';
+import { ProjectView } from '../components/AddProject';
 
 @Entry
 @Component
 struct Index {
-  // @Provide gtdController: GTDController = new GTDController();
-  @Provide gtdController: GTDController = new GTDController(new DatabaseGTDDataSource());
+  @Provide gtdController: GTDController = new GTDController(new MockGTDDataSource);
+  // @Provide gtdController: GTDController = new GTDController(new DatabaseGTDDataSource());
   @Provide currentEditingTask: TaskModel | {id:-1, name:'', createdDate:Date, isCompleted:boolean } = {id:-1, name:'', createdDate:new Date(0), isCompleted:false};
   @Provide isPopupVisible: boolean = false;
 
@@ -144,17 +146,33 @@ struct Index {
 
         TabContent() {
           // 项目页面内容
-          Text("项目")
+          Text("收集箱")
             .fontSize(50)
             .fontWeight(FontWeight.Bold)
+
         }
         .tabBar(this.TabBuilder("收集箱", 1, "📥"))
 
         TabContent() {
           // 项目页面内容
-          Text("项目")
-            .fontSize(50)
-            .fontWeight(FontWeight.Bold)
+
+          Column() {
+
+            Text("项目")
+              .fontSize(24)
+              .fontWeight(FontWeight.Medium)
+              .padding({ top: 20, bottom: 10 })
+
+            ProjectView({})
+
+
+          }
+          .width('95%')
+          .layoutWeight(1)
+          .height('100%')
+          .alignItems(HorizontalAlign.Start) // 添加这一行
+
+
         }
         .tabBar(this.TabBuilder("项目", 2, "📁"))
 

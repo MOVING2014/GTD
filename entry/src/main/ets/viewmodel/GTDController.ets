@@ -8,6 +8,8 @@ export class GTDController {
   projectCache: Record<number, ProjectModel | null> = {};
   contextCache: Record<number, ContextModel | null> = {};
   reminderCache: Record<number, ReminderModel |null> = {};
+  taskCache: Record<number, TaskModel |null> = {};
+
   private observers: Set<() => void> = new Set();
 
 
@@ -29,6 +31,11 @@ export class GTDController {
       const projects = await this.getAllProjects();
       projects.forEach(project => {
         this.projectCache[project.id] = project;
+      });
+
+      const tasks = await this.getAllTasks();
+      tasks.forEach(task => {
+        this.taskCache[task.id] = task;
       });
 
       const contexts = await this.getAllContexts();

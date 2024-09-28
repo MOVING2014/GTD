@@ -35,19 +35,22 @@ export  class MockGTDDataSource implements GTDDataSource {
       id: 1,
       name: "X项目流程",
       description: "与工作相关的所有任务",
-      taskIds: [1]
+      taskIds: [1],
+      isExpended: false
     },
     {
       id: 2,
       name: "网球",
       description: "与工作相关的所有任务",
-      taskIds: [2]
+      taskIds: [2],
+      isExpended: true
     },
     {
       id: 3,
       name: "GTD APP",
       description: "与工作相关的所有任务",
-      taskIds: []
+      taskIds: [1,2],
+      isExpended: true
     }
 
   ];

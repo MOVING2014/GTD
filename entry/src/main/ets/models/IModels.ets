@@ -18,6 +18,7 @@ export interface ProjectModel {
   name: string;
   description?: string;
   taskIds?: number[];
+  isExpended: boolean;
 }
 
 export interface ContextModel {

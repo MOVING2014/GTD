@@ -240,6 +240,7 @@ export class DatabaseGTDDataSource implements GTDDataSource {
       id: resultSet.getLong(resultSet.getColumnIndex('id')),
       name: resultSet.getString(resultSet.getColumnIndex('name')),
       description: resultSet.getString(resultSet.getColumnIndex('description')),
+      isExpended: resultSet.getLong(resultSet.getColumnIndex('isExpended')) === 1,
     };
   }
 
