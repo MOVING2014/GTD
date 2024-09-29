@@ -95,6 +95,17 @@ export  function  parseDate(dateString: string): Date {
 }
 
 
+export  function  stringToDate(dateString: string): Date {
+
+  if (!dateString || dateString.trim() === '') {
+    return null; // 返回 null 表示无效日期
+  }
+
+  return new Date(dateString);
+
+}
+
+
 export function overDue(dueDate: Date): boolean {
   let today = new Date();
   today.setHours(0, 0, 0, 0); // 设置时间为当天的开始

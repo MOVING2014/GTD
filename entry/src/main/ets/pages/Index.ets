@@ -11,6 +11,7 @@ import display from '@ohos.display';
 import { FlaggedItem } from '../components/FlaggedItem';
 import { MockGTDDataSource } from '../data/MockGTDDataSource';
 import { ProjectView } from '../components/ProjectView';
+import { WeekView } from '../components/Calendar';
 
 @Entry
 @Component
@@ -39,6 +40,10 @@ struct Index {
   @State private newProjectDescription: string = '';
 
   @State isLoading: boolean = true;
+  @State selectedDateString: string = new Date().toString();
+
+  @State filteredTasks: TaskModel[] = [];
+
 
 
 
@@ -157,6 +162,37 @@ struct Index {
 
 
 
+  handleDateSelect(date: Date) {
+    this.selectedDateString = date.toString();
+
+    this.filterTasks(date);
+
+    // 这里可以添加筛选任务的逻辑
+    hilog.debug(0x001, 'TaskList', `Selected date: ${date.toDateString()}`);
+  }
+
+  private filterTasks(selectedDate: Date) {
+    // 确保选中的日期只包含年月日信息，不包含时分秒
+    const startOfDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setDate(endOfDay.getDate() + 1);
+
+    this.filteredTasks = this.tasks.filter(task => {
+      const taskDate = new Date(task.dueDate); // 假设 task.planTime 是任务计划日期
+
+
+
+      return taskDate.getTime() >= startOfDay.getTime() && taskDate.getTime() <= endOfDay.getTime();
+    });
+
+    hilog.debug(0x001, 'TaskList', `Filtered tasks: ${JSON.stringify(this.filteredTasks)}`);
+    hilog.debug(0x001, 'TaskList', `startOfDay: ${JSON.stringify(startOfDay)}`);
+    hilog.debug(0x001, 'TaskList', `endOfDay: ${JSON.stringify(endOfDay)}`);
+    hilog.debug(0x001, 'TaskList', `endOfDay.gettime: ${JSON.stringify(endOfDay.getTime())}`);
+  }
+
+
+
   build() {
 
     // if(this.isLoading) {
@@ -180,13 +216,17 @@ struct Index {
         TabContent() {
           Column() {
 
+
+
             Text("待办事项")
               .fontSize(24)
               .fontWeight(FontWeight.Medium)
               .padding({ top: 20, bottom: 10 })
 
+            WeekView({ onDateSelect: this.handleDateSelect.bind(this) })
+
             TaskList({
-              tasks: $tasks
+              tasks: $filteredTasks
             })
 
 
