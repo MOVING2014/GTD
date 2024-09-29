@@ -45,12 +45,14 @@ export struct WeekView {
   }
 
   private getUncompletedTaskCount(date: Date): number {
-    return this.tasks.filter(task => {
+     let len = this.tasks.filter(task => {
       if(!task.dueDate) return false;
       const taskDate = task.dueDate;
-      return isSameDay(date, taskDate) &&
-      !task.isCompleted; // 假设任务模型有 completed 属性
+      hilog.debug(0x002,'Calendar',`taskid:${task.title} taskDate:${taskDate},date: ${date}, ${isSameDay(date, taskDate).toString()}`);
+      return isSameDay(date, taskDate) && !task.isCompleted; // 假设任务模型有 completed 属性
     }).length;
+
+    return len
   }
 
 

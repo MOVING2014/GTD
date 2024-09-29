@@ -13,7 +13,7 @@ import { MockGTDDataSource } from '../data/MockGTDDataSource';
 import { ProjectView } from '../components/ProjectView';
 import { WeekView } from '../components/Calendar';
 import { InboxView } from '../components/InBoxView';
-import { stringToDate } from '../common/utils';
+import { isSameDay, stringToDate } from '../common/utils';
 
 @Entry
 @Component
@@ -183,8 +183,8 @@ struct Index {
     endOfDay.setDate(endOfDay.getDate() + 1);
 
     this.filteredTasks = this.tasks.filter(task => {
-      const taskDate = new Date(task.dueDate); // 假设 task.planTime 是任务计划日期
-      return taskDate.getTime() >= startOfDay.getTime() && taskDate.getTime() <= endOfDay.getTime();
+      const taskDate = new Date(task.dueDate);
+      return isSameDay(taskDate, selectedDate)
     });
 
   }
