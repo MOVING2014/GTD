@@ -14,22 +14,18 @@ export  struct ProjectView {
   @Link  projects: ProjectModel[];
   @State loadingProjects: Set<number> = new Set()
   @Consume taskUpdateTrigger: number;
-  @State isLoading: boolean  = true;
 
   // @Consume isPopupVisible: boolean;
   // @State showCompletedTasks: boolean = false
   async aboutToAppear(){
-    this.isLoading = true
     await this.loadProjects()
     hilog.debug(0x001,'ProjectView',`project for taskids: ${this.projects}`)
   }
 
   async loadProjects() {
-    this.isLoading = true
     try {
       this.projects = await this.gtdController.getAllProjects();
       await this.gtdController.initializeCache();
-      this.isLoading = false
     } catch (error) {
       console.error('Failed to load projects:', error);
     }
@@ -41,7 +37,6 @@ export  struct ProjectView {
 
 
   build() {
-    if(!this.isLoading) {
 
       List() {
         ForEach(this.projects, (project: ProjectModel) => {
@@ -54,7 +49,7 @@ export  struct ProjectView {
       }
       .width('100%')
       .height('100%')
-    }
+
   }
 
   @Builder ProjectItem(project: ProjectModel) {

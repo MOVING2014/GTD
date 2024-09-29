@@ -85,16 +85,17 @@ struct Index {
       this.isLoading = true
       this.tasks = await this.gtdController.getAllTasks();
       hilog.debug(0x001,'tasksload',`tasksload:  ${JSON.stringify(this.tasks)}`)
+      this.projects = await this.gtdController.getAllProjects()
+      await this.gtdController.initializeCache()
       this.taskUpdateTrigger++
-
-
 
     } catch (error) {
       console.error('Failed to load tasks:', error);
+    }finally {
+      this.isLoading = false;
     }
-    this.projects = await this.gtdController.getAllProjects()
-    await this.gtdController.initializeCache()
-    this.isLoading = false
+
+
   }
 
 
@@ -105,7 +106,6 @@ struct Index {
       // this.popupOpacity = 1;
       this.popupTranslateY = 0;
 
-      // this.showInputMethod()
     });
 
   }
@@ -158,7 +158,21 @@ struct Index {
 
 
   build() {
-    if(!this.isLoading){
+
+    // if(this.isLoading) {
+    //   Column() {
+    //     LoadingProgress()
+    //       .color(Color.Green)
+    //       .width(50)
+    //       .height(50)
+    //     Text('加载中...')
+    //       .fontSize(16)
+    //       .margin({ top: 20 })
+    //   }
+    //   .width('100%')
+    //   .height('100%')
+    //   .justifyContent(FlexAlign.Center)
+    // }else  if(!this.isLoading){
 
 
     Stack({ alignContent: Alignment.BottomEnd }) {
@@ -366,6 +380,6 @@ struct Index {
     .width('100%')
     // .height(this.StackHeight)
     // .margin({top:this.topMargin})
-    }
+    // }
   }
 }

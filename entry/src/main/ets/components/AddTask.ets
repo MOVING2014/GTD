@@ -327,10 +327,10 @@ export struct AddTaskComponent {
           .onChange((value: string) => {
             this.title = value;
           })
-          .key('123')
+          .key('taskinput')
           .onAppear(()=>{
-            sendEventByKey('123',10,'弹出键盘')
-            sendEventByKey('123',10,'弹出键盘')
+            sendEventByKey('taskinput',10,'弹出键盘')
+            // sendEventByKey('123',10,'弹出键盘')
           })
 
       }
