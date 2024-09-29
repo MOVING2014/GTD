@@ -290,7 +290,7 @@ export struct AddTaskComponent {
     let currentDate = new Date()
 
       DatePickerDialog.show({
-        start: new Date(),
+        start: new Date('2023-01-01'),
         end: new Date('2100-12-31'),
         selected: currentDate,
         onAccept: (value: DatePickerResult) => {
