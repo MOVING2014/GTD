@@ -12,6 +12,8 @@ import { FlaggedItem } from '../components/FlaggedItem';
 import { MockGTDDataSource } from '../data/MockGTDDataSource';
 import { ProjectView } from '../components/ProjectView';
 import { WeekView } from '../components/Calendar';
+import { InboxView } from '../components/InBoxView';
+import { stringToDate } from '../common/utils';
 
 @Entry
 @Component
@@ -92,6 +94,9 @@ struct Index {
       hilog.debug(0x001,'tasksload',`tasksload:  ${JSON.stringify(this.tasks)}`)
       this.projects = await this.gtdController.getAllProjects()
       await this.gtdController.initializeCache()
+
+
+      this.filterTasks(stringToDate(this.selectedDateString));
       this.taskUpdateTrigger++
 
     } catch (error) {
@@ -179,16 +184,9 @@ struct Index {
 
     this.filteredTasks = this.tasks.filter(task => {
       const taskDate = new Date(task.dueDate); // 假设 task.planTime 是任务计划日期
-
-
-
       return taskDate.getTime() >= startOfDay.getTime() && taskDate.getTime() <= endOfDay.getTime();
     });
 
-    hilog.debug(0x001, 'TaskList', `Filtered tasks: ${JSON.stringify(this.filteredTasks)}`);
-    hilog.debug(0x001, 'TaskList', `startOfDay: ${JSON.stringify(startOfDay)}`);
-    hilog.debug(0x001, 'TaskList', `endOfDay: ${JSON.stringify(endOfDay)}`);
-    hilog.debug(0x001, 'TaskList', `endOfDay.gettime: ${JSON.stringify(endOfDay.getTime())}`);
   }
 
 
@@ -213,6 +211,30 @@ struct Index {
 
     Stack({ alignContent: Alignment.BottomEnd }) {
       Tabs({ barPosition: BarPosition.End, controller: this.tabsController }) {
+
+        TabContent() {
+          // 收集
+          Column() {
+
+            Text("收集")
+              .fontSize(24)
+              .fontWeight(FontWeight.Medium)
+              .padding({ top: 20, bottom: 10 })
+
+            InboxView({
+              tasks: $tasks
+            })
+
+
+          }
+          .width('95%')
+          .layoutWeight(1)
+          .height('100%')
+          .alignItems(HorizontalAlign.Start) // 添加这一行
+
+        }
+        .tabBar(this.TabBuilder("收集箱", 1, "📥"))
+
         TabContent() {
           Column() {
 
@@ -223,7 +245,9 @@ struct Index {
               .fontWeight(FontWeight.Medium)
               .padding({ top: 20, bottom: 10 })
 
-            WeekView({ onDateSelect: this.handleDateSelect.bind(this) })
+            WeekView({
+              tasks: $tasks,
+              onDateSelect: this.handleDateSelect.bind(this) })
 
             TaskList({
               tasks: $filteredTasks
@@ -240,14 +264,6 @@ struct Index {
         }
         .tabBar(this.TabBuilder("日历", 0, "📅"))
 
-        TabContent() {
-          // 项目页面内容
-          Text("收集箱")
-            .fontSize(50)
-            .fontWeight(FontWeight.Bold)
-
-        }
-        .tabBar(this.TabBuilder("收集箱", 1, "📥"))
 
         TabContent() {
           // 项目页面内容

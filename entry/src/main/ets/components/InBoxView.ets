@@ -1,12 +1,12 @@
 import hilog from '@ohos.hilog';
-import { TaskItem } from '../common/CommonBuilders';
+import { ContextLabel, ProjectLabel, TaskItem } from '../common/CommonBuilders';
 import { Constants } from '../common/Constants';
 import { formatDateToChinese, overDue } from '../common/utils';
 import { ProjectModel, TaskModel } from '../models/IModels';
 import { GTDController } from '../viewmodel/GTDController';
 
 @Component
-export struct TaskList {
+export struct InboxView {
   @Link tasks: TaskModel[];
   @State projects: ProjectModel[]|null = null;
   @Consume gtdController: GTDController;
@@ -15,50 +15,20 @@ export struct TaskList {
   @State showCompletedTasks: boolean = false
 
 
-aboutToAppear(){
-}
-
-
-  // async loadTasks() {
-  //   try {
-  //     this.tasks = await this.gtdController.getAllTasks();
-  //     hilog.debug(0x001,'tasksload',`tasksload:  ${JSON.stringify(this.tasks)}`)
-  //
-  //
-  //   } catch (error) {
-  //     console.error('Failed to load tasks:', error);
-  //   }
-  //   this.gtdController.initializeCache()
-  // }
-
-  @Builder
-  ProjectLabel(projectId: number) {
-    if (projectId) {
-      Row() {
-        Text(this.gtdController.projectCache[projectId]?.name || '')
-          .fontSize(16)
-          .fontColor('#666666')
-          .backgroundColor('#F0F0F0')
-          .borderRadius(4)
-          // .padding({ left: 6, right: 6, top: 2, bottom: 2 })
-          .margin({ right: 8, top:5 })
-      }
-    }
+  aboutToAppear(){
   }
 
 
-  @Builder
-  ContextLabel(contextId: number) {
-    if (contextId) {
-      Row() {
-        Text(this.gtdController.contextCache[contextId]?.name || '')
-          .fontSize(16)
-          .fontColor('#666666')
-          .backgroundColor('#F0F0F0')
-          .borderRadius(4)
-          .margin({ right: 8, top:5 })
-      }
+  async loadTasks() {
+    try {
+      this.tasks = await this.gtdController.getAllTasks();
+      hilog.debug(0x001,'tasksload',`tasksload:  ${JSON.stringify(this.tasks)}`)
+
+
+    } catch (error) {
+      console.error('Failed to load tasks:', error);
     }
+    this.gtdController.initializeCache()
   }
 
 
@@ -77,7 +47,7 @@ aboutToAppear(){
         this.currentEditingTask = record;
         this.isPopupVisible = true;
         hilog.debug(0x009,'TaskItem',`TaskItem load tasks ${JSON.stringify(this.tasks[1])}`)
-        // this.loadTasks()
+        this.loadTasks()
       })
       .margin({right:10})
       // 侧滑后尾端出现的组件
@@ -92,7 +62,7 @@ aboutToAppear(){
       .onClick(async () => {
         // this.controller.deleteMoodRecord(record.id)
         await this.gtdController.deleteTask(record.id)
-        // this.loadTasks()
+        this.loadTasks()
 
       })
 
@@ -101,31 +71,28 @@ aboutToAppear(){
 
 
 
+
+
+
   build() {
     Column() {
       List() {
         ForEach(this.tasks
-         .filter(task => !task.isCompleted),
+          .filter(task => !task.isCompleted && (task.projectId == null || task.projectId == undefined || task.projectId == -1)),
           (task: TaskModel, index: number) => {
-          ListItem() {
-
-            TaskItem(task, this.gtdController,
-              // () => this.loadTasks()
-              () => {}
-            )
-
+            ListItem() {
+              TaskItem(task, this.gtdController, () => this.loadTasks())
+            }
+            .swipeAction({ end: this.itemEnd(task) })
           }
-          .swipeAction({ end: this.itemEnd(task) })
-        }
-        // , (task: TaskModel ,index:number) => {return index + '_' +  task.isCompleted.toString();}
         )
       }
       .width('100%')
 
       Divider()
-      .strokeWidth(0.5)
-      .width('90%')
-      .margin({top:10, bottom:10})
+        .strokeWidth(0.5)
+        .width('90%')
+        .margin({top:10, bottom:10})
 
 
       // 添加一个按钮来控制已完成任务的显示/隐藏
@@ -140,26 +107,24 @@ aboutToAppear(){
       .borderRadius(5)
       .align(Alignment.Start)
       .alignSelf(ItemAlign.Start)
-        .onClick(() => {
-          this.showCompletedTasks = !this.showCompletedTasks;
-        })
-        .margin({ bottom: 10 })
+      .onClick(() => {
+        this.showCompletedTasks = !this.showCompletedTasks;
+      })
+      .margin({ bottom: 10 })
+
+
 
       if(this.showCompletedTasks) {
         List() {
           ForEach(this.tasks
-            .filter(task => task.isCompleted)
-             .sort((a, b) => new Date(b.modifyTime).getTime() - new Date(a.modifyTime).getTime()),
+            .filter(task => task.isCompleted && !!task.projectId)
+            .sort((a, b) => new Date(b.modifyTime).getTime() - new Date(a.modifyTime).getTime()),
             (task: TaskModel, index: number) => {
-            ListItem() {
-
-              TaskItem(task, this.gtdController,
-                // () => this.loadTasks()
-                () => {}
-              )
-            }
-            .swipeAction({ end: this.itemEnd(task) })
-          })
+              ListItem() {
+                TaskItem(task, this.gtdController, () => this.loadTasks())
+              }
+              .swipeAction({ end: this.itemEnd(task) })
+            })
         }
         .width('100%')
       }
@@ -167,6 +132,5 @@ aboutToAppear(){
 
   }
 }
-
 
 

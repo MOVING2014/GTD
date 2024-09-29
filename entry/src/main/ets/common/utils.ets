@@ -47,6 +47,8 @@ export function  formatDate(dateString: string, timeOnly: boolean = false): stri
 
 
 export function  isSameDay(date1: Date, date2: Date): boolean {
+  if(!date1) return false
+  if(!date2) return false
   return date1.getFullYear() === date2.getFullYear() &&
   date1.getMonth() === date2.getMonth() &&
   date1.getDate() === date2.getDate();

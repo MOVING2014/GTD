@@ -1,13 +1,16 @@
 // WeekView.ets
 import hilog from '@ohos.hilog';
-import { parseDate, stringToDate } from '../common/utils';
+import { isSameDay, parseDate, stringToDate } from '../common/utils';
+import { TaskModel } from '../models/IModels';
 
 @Component
 export struct WeekView {
   @State recentDays: Date[] = [];
   @State selectedDateString: string = new Date().toString();
   @State updateTrigger: number = 0;
-   onDateSelect: (date: Date) => void;
+  @Link  tasks: TaskModel[];
+
+  onDateSelect: (date: Date) => void;
 
   aboutToAppear() {
     this.initializeRecentDays();
@@ -41,6 +44,17 @@ export struct WeekView {
     date.getFullYear() === stringToDate(this.selectedDateString).getFullYear();
   }
 
+  private getUncompletedTaskCount(date: Date): number {
+    return this.tasks.filter(task => {
+      if(!task.dueDate) return false;
+      const taskDate = task.dueDate;
+      return isSameDay(date, taskDate) &&
+      !task.isCompleted; // 假设任务模型有 completed 属性
+    }).length;
+  }
+
+
+
   build() {
     Row() {
       ForEach(this.recentDays, (day, index) => {
@@ -50,25 +64,31 @@ export struct WeekView {
               .fontSize(10)
               .fontColor('#666666')
               .fontWeight(FontWeight.Bold)
-
-            Blank()
+              .margin({right:3})
 
             Text(day.getDate().toString())
               .fontSize(12)
               .fontWeight(FontWeight.Bold)
-              .fontColor(this.isToday(day) ? '#FFFFFF' : '#666666')
+              .fontColor(this.isToday(day) ? '#666666' : '#666666')
 
-          }.margin({top:5})
+          }.margin({top:10})
           .width('70%')
           .justifyContent(FlexAlign.SpaceAround)
+
           Blank()
+
+          Text(this.getUncompletedTaskCount(day).toString())
+            .fontSize(14)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(this.isToday(day) ? '#666666' : '#666666')
+            .margin({ bottom: 10 })
         }
         .width(50)
-        .height(80)
+        .height(60)
         .margin({ right: 5 })
         .borderRadius(8)
         .backgroundColor(this.isSelected(day) ? '#79007aff' :
-          this.isToday(day) ? '#E6F2FF' : '#F0F0F0')
+          this.isToday(day) ? '#1dff003b' : '#F0F0F0')
         .justifyContent(FlexAlign.Center)
         .onClick(() => {
           this.selectedDateString = day.toString()

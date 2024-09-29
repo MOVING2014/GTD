@@ -14,9 +14,12 @@ export  struct ProjectView {
   @Link  projects: ProjectModel[];
   @State loadingProjects: Set<number> = new Set()
   @Consume taskUpdateTrigger: number;
+  @Consume isPopupVisible: boolean;
+  @State showCompletedTasks: boolean = false
+  @Consume currentEditingTask: TaskModel;
 
-  // @Consume isPopupVisible: boolean;
-  // @State showCompletedTasks: boolean = false
+
+
   async aboutToAppear(){
     await this.loadProjects()
     hilog.debug(0x001,'ProjectView',`project for taskids: ${this.projects}`)
@@ -51,6 +54,44 @@ export  struct ProjectView {
       .height('100%')
 
   }
+
+
+  @Builder itemEnd(record: TaskModel) {
+    Row() {
+      Button({ type: ButtonType.Circle }) {
+        Text('EDIT')
+          .fontColor(Color.White)
+          .width(40)
+          .height(40)
+          .textAlign(TextAlign.Center)
+      }
+      .backgroundColor(Constants.editButtonColor)
+      .onClick(() => {
+        this.currentEditingTask = record;
+        this.isPopupVisible = true;
+        // hilog.debug(0x009,'TaskItem',`TaskItem load tasks ${JSON.stringify(this.tasks[1])}`)
+
+      })
+      .margin({right:10})
+      // 侧滑后尾端出现的组件
+      Button({ type: ButtonType.Circle }) {
+        Text('DEL')
+          .fontColor(Color.White)
+          .width(40)
+          .height(40)
+          .textAlign(TextAlign.Center)
+      }
+      .backgroundColor(Constants.deleteButtonColor)
+      .onClick(async () => {
+        // this.controller.deleteMoodRecord(record.id)
+        await this.gtdController.deleteTask(record.id)
+
+
+      })
+
+    }
+  }
+
 
   @Builder ProjectItem(project: ProjectModel) {
     Column() {
@@ -108,6 +149,7 @@ export  struct ProjectView {
 
                   })
               }
+              .swipeAction({ end: this.itemEnd(this.gtdController.taskCache[taskId]) })
             },   taskId => `${taskId}-${this.gtdController.taskCache[taskId].isCompleted}-${this.taskUpdateTrigger}`
             )
           }
