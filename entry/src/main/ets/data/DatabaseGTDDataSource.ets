@@ -1,4 +1,5 @@
 import relationalStore from '@ohos.data.relationalStore';
+import hilog from '@ohos.hilog';
 import { TaskModel, ProjectModel, ContextModel, ReminderModel } from '../models/IModels';
 import { DatabaseService } from '../services/DatabaseService';
 import { GTDDataSource } from './IDataSource';
@@ -236,20 +237,37 @@ export class DatabaseGTDDataSource implements GTDDataSource {
   }
 
   private resultSetToProject(resultSet: relationalStore.ResultSet): ProjectModel {
-    return {
+    const project =  {
       id: resultSet.getLong(resultSet.getColumnIndex('id')),
       name: resultSet.getString(resultSet.getColumnIndex('name')),
       description: resultSet.getString(resultSet.getColumnIndex('description')),
+      taskIds: this.deSeri(resultSet.getString(resultSet.getColumnIndex('taskIds'))),
       isExpended: resultSet.getLong(resultSet.getColumnIndex('isExpended')) === 1,
     };
+    hilog.debug(0x000, ' DatabaseGTDDataSource:resultSetToProject', `project : ${JSON.stringify(project)}}`)
+
+    return project
   }
 
+  private seri(ids: number[]){
+    return JSON.stringify(ids)
+  }
+  private deSeri(taskIdsString: string): number[] {
+    if(!taskIdsString) { return [] }
+    const taskIds = JSON.parse(taskIdsString) as number[];
+    return taskIds
+  }
+
+
   private projectToValuesBucket(project: ProjectModel): relationalStore.ValuesBucket {
-    return {
+    const valueBucket =  {
       name: project.name,
       description: project.description,
+      taskIds: project.taskIds ? this.seri(project.taskIds) : "[]" ,
       isExpended: project.isExpended ? 1:0
     };
+    hilog.debug(0x000, ' DatabaseGTDDataSource:projectToValuesBucket', `valueBUcket: ${JSON.stringify(valueBucket)}}`)
+    return valueBucket
   }
 
   private resultSetToContexts(resultSet: relationalStore.ResultSet): ContextModel[] {

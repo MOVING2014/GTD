@@ -55,6 +55,7 @@ export class DatabaseService {
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           name TEXT NOT NULL,
           description TEXT,
+          taskIds TEXT,
           isExpended INTEGER
       )`;
       await this.rdbStore.executeSql(SQL_CREATE_PROJECTS);
