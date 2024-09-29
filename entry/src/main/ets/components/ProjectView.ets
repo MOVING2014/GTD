@@ -13,7 +13,7 @@ export  struct ProjectView {
   // @Link tasks: TaskModel[];
   @Link  projects: ProjectModel[];
   @State loadingProjects: Set<number> = new Set()
-  @State taskUpdateTrigger: number = 0;
+  @Consume taskUpdateTrigger: number;
   @State isLoading: boolean  = true;
 
   // @Consume isPopupVisible: boolean;
@@ -49,7 +49,7 @@ export  struct ProjectView {
             this.ProjectItem(project)
           }
         }
-          , project => `${JSON.stringify(project)}`
+          , project => `${JSON.stringify(project)}—${this.taskUpdateTrigger}`
         )
       }
       .width('100%')

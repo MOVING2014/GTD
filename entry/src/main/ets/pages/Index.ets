@@ -19,6 +19,7 @@ struct Index {
   @Provide gtdController: GTDController = new GTDController(new DatabaseGTDDataSource());
   @Provide currentEditingTask: TaskModel | {id:-1, name:'', createdDate:Date, isCompleted:boolean } = {id:-1, name:'', createdDate:new Date(0), isCompleted:false};
   @Provide isPopupVisible: boolean = false;
+  @Provide taskUpdateTrigger: number = 0;
 
   private tabsController: TabsController = new TabsController();
   @State currentIndex: number = 0;
@@ -84,6 +85,7 @@ struct Index {
       this.isLoading = true
       this.tasks = await this.gtdController.getAllTasks();
       hilog.debug(0x001,'tasksload',`tasksload:  ${JSON.stringify(this.tasks)}`)
+      this.taskUpdateTrigger++
 
 
 
