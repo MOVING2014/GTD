@@ -6,11 +6,11 @@ import { TaskModel } from '../models/IModels';
 @Component
 export struct WeekView {
   @State recentDays: Date[] = [];
-  @State selectedDateString: string = new Date().toString();
+  @State selectedDateString: string  = new Date().toString();
   @State updateTrigger: number = 0;
   @Link  tasks: TaskModel[];
 
-  onDateSelect: (date: Date) => void;
+  onDateSelect: (date: Date |'') => void;
 
   aboutToAppear() {
     this.initializeRecentDays();
@@ -38,7 +38,7 @@ export struct WeekView {
   }
 
   private isSelected(date: Date): boolean {
-
+    if (!this.selectedDateString) return false;
     return date.getDate() === stringToDate(this.selectedDateString).getDate() &&
     date.getMonth() === stringToDate(this.selectedDateString).getMonth() &&
     date.getFullYear() === stringToDate(this.selectedDateString).getFullYear();
@@ -48,7 +48,7 @@ export struct WeekView {
      let len = this.tasks.filter(task => {
       if(!task.dueDate) return false;
       const taskDate = task.dueDate;
-      hilog.debug(0x002,'Calendar',`taskid:${task.title} taskDate:${taskDate},date: ${date}, ${isSameDay(date, taskDate).toString()}`);
+      // hilog.debug(0x002,'Calendar',`taskid:${task.title} taskDate:${taskDate},date: ${date}, ${isSameDay(date, taskDate).toString()}`);
       return isSameDay(date, taskDate) && !task.isCompleted; // 假设任务模型有 completed 属性
     }).length;
 
@@ -93,9 +93,20 @@ export struct WeekView {
           this.isToday(day) ? '#1dff003b' : '#F0F0F0')
         .justifyContent(FlexAlign.Center)
         .onClick(() => {
-          this.selectedDateString = day.toString()
+
+          if (this.isSelected(day)) {
+            // 如果点击的是已选中的日期，则取消选中
+            this.selectedDateString = '';
+            this.onDateSelect('');
+          } else {
+            // 否则选中新的日期
+            this.selectedDateString = day.toString();
+            hilog.debug(0x002,'Calendar',`${this.selectedDateString}`)
+            this.onDateSelect(day);
+          }
+          // this.selectedDateString = day.toString()
           this.updateTrigger++
-          this.onDateSelect(day); // 需要触发任务的过滤动作
+          // this.onDateSelect(day); // 需要触发任务的过滤动作
         })
       },
         day => `${day} - ${this.updateTrigger}`

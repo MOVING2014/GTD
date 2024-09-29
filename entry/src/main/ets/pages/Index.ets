@@ -167,13 +167,16 @@ struct Index {
 
 
 
-  handleDateSelect(date: Date) {
-    this.selectedDateString = date.toString();
-
-    this.filterTasks(date);
+  handleDateSelect(date: Date |'') {
+    if(date === ''){
+      this.filteredTasks = this.tasks
+    }else {
+      this.selectedDateString = date.toString();
+      this.filterTasks(date);
+    }
 
     // 这里可以添加筛选任务的逻辑
-    hilog.debug(0x001, 'TaskList', `Selected date: ${date.toDateString()}`);
+    // hilog.debug(0x001, 'TaskList', `Selected date: ${date.toDateString()}`);
   }
 
   private filterTasks(selectedDate: Date) {
