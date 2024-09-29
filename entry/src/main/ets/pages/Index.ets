@@ -233,7 +233,7 @@ struct Index {
           .alignItems(HorizontalAlign.Start) // 添加这一行
 
         }
-        .tabBar(this.TabBuilder("收集箱", 1, "📥"))
+        .tabBar(this.TabBuilder("收集箱", 0, "📥"))
 
         TabContent() {
           Column() {
@@ -262,7 +262,7 @@ struct Index {
 
 
         }
-        .tabBar(this.TabBuilder("日历", 0, "📅"))
+        .tabBar(this.TabBuilder("日历", 1, "📅"))
 
 
         TabContent() {

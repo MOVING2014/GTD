@@ -1,7 +1,7 @@
 
 import { TaskModel } from '../models/IModels'
 import { GTDController } from '../viewmodel/GTDController'
-import { formatDateToChinese, overDue } from './utils'
+import { formatDate, formatDateToChinese, overDue } from './utils'
 
 
 @Builder export function ProjectLabel(projectId: number, controller: GTDController) {

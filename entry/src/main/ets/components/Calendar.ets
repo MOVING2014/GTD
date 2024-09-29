@@ -62,9 +62,9 @@ export struct WeekView {
       ForEach(this.recentDays, (day, index) => {
         Column() {
           Row() {
-            Text(this.formatDayOfWeek(day))
+            Text(this.isToday(day) ? '今天' : this.formatDayOfWeek(day))
               .fontSize(10)
-              .fontColor('#666666')
+              .fontColor(this.isToday(day) ? '#b9990000' : '#666666')
               .fontWeight(FontWeight.Bold)
               .margin({right:3})
 
