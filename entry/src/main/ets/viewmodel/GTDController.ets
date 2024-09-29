@@ -1,6 +1,7 @@
 import { ContextModel, ProjectModel, ReminderModel, TaskModel } from '../models/IModels';
 import { GTDDataSource } from '../data/IDataSource';
 import { MockGTDDataSource } from '../data/MockGTDDataSource';
+import hilog from '@ohos.hilog';
 
 export class GTDController {
   private dataSource: GTDDataSource;
@@ -72,6 +73,51 @@ export class GTDController {
     this.dataSource = dataSource;
   }
 
+
+  private async recalculateProjectTaskIds() {
+    const projects = await this.getAllProjects();
+    const tasks = await this.getAllTasks();
+
+    const projectTaskMap = new Map<number, Set<number>>();
+
+    // 初始化每个项目的任务 ID 集合
+    projects.forEach(project => {
+      projectTaskMap.set(project.id, new Set<number>());
+    });
+
+    // 遍历所有任务，将任务 ID 添加到相应的项目中
+    tasks.forEach(task => {
+      if (task.projectId !== undefined && task.projectId !== null && task.id !== undefined && task.id !== null) {
+        let taskIds = projectTaskMap.get(task.projectId);
+        if (!taskIds) {
+          taskIds = new Set<number>();
+
+        }
+        taskIds.add(task.id);
+        projectTaskMap.set(task.projectId, taskIds);
+
+        // 添加日志来检查是否成功添加
+        hilog.debug(0x001, 'ProjectView:GTDController', `Added task ${task.id} to project ${task.projectId}. Current tasks: ${Array.from(taskIds).join(', ')}`);
+      } else {
+        hilog.warn(0x001, 'ProjectView:GTDController', `Invalid task or project ID: ${JSON.stringify(task)}`);
+      }
+    });
+
+    // 更新每个项目的 taskIds
+    for (const project of projects) {
+      const taskIds = Array.from(projectTaskMap.get(project.id) || []);
+      project.taskIds = taskIds;
+      await this.updateProject(project);
+    }
+
+    // 更新缓存
+    projects.forEach(project => {
+      this.projectCache[project.id] = project;
+    });
+
+    // this.notifyObservers();
+  }
+
   // Task methods
   async getAllTasks(): Promise<TaskModel[]> {
     return this.dataSource.getTasks();
@@ -89,6 +135,7 @@ export class GTDController {
     //   await this.updateProjectTasks(taskReturn.projectId, taskReturn.id, true);
     //   await this.initializeCache()
     // }
+    await this.recalculateProjectTaskIds()
 
     this.notifyObservers()
     return  taskReturn
@@ -96,6 +143,7 @@ export class GTDController {
 
   async updateTask(task: TaskModel): Promise<TaskModel> {
     const taskReturn = await this.dataSource.updateTask(task);
+    await this.recalculateProjectTaskIds()
     this.notifyObservers()
     return taskReturn
   }
@@ -118,6 +166,7 @@ export class GTDController {
   async deleteTask(taskId: number): Promise<boolean> {
     // this.notifyObservers()
     const taskReturn = this.dataSource.deleteTask(taskId);
+    await this.recalculateProjectTaskIds()
     this.notifyObservers()
     return taskReturn
   }

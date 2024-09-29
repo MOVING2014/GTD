@@ -37,9 +37,12 @@ struct Index {
   @State private newProjectName: string = '';
   @State private newProjectDescription: string = '';
 
+  @State isLoading: boolean = true;
+
 
 
   aboutToAppear() {
+
     this.gtdController.addObserver(()=>this.loadTasks())
     this.loadTasks();
 
@@ -76,7 +79,9 @@ struct Index {
   }
 
   async loadTasks() {
+    this.isLoading = true
     try {
+      this.isLoading = true
       this.tasks = await this.gtdController.getAllTasks();
       hilog.debug(0x001,'tasksload',`tasksload:  ${JSON.stringify(this.tasks)}`)
 
@@ -87,6 +92,7 @@ struct Index {
     }
     this.projects = await this.gtdController.getAllProjects()
     await this.gtdController.initializeCache()
+    this.isLoading = false
   }
 
 
@@ -150,6 +156,9 @@ struct Index {
 
 
   build() {
+    if(!this.isLoading){
+
+
     Stack({ alignContent: Alignment.BottomEnd }) {
       Tabs({ barPosition: BarPosition.End, controller: this.tabsController }) {
         TabContent() {
@@ -355,6 +364,6 @@ struct Index {
     .width('100%')
     // .height(this.StackHeight)
     // .margin({top:this.topMargin})
-
+    }
   }
 }

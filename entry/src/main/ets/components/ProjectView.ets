@@ -1,6 +1,7 @@
 // import { TaskData, ProjectData } from './DataTypes'
 import hilog from '@ohos.hilog';
 import { TaskItem } from '../common/CommonBuilders';
+import { Constants } from '../common/Constants';
 import { TaskModel, ProjectModel } from '../models/IModels';
 import { GTDController } from '../viewmodel/GTDController';
 
@@ -10,25 +11,29 @@ import { GTDController } from '../viewmodel/GTDController';
 export  struct ProjectView {
   @Consume gtdController: GTDController;
   // @Link tasks: TaskModel[];
-  @Link projects: ProjectModel[];
+  @Link  projects: ProjectModel[];
   @State loadingProjects: Set<number> = new Set()
   @State taskUpdateTrigger: number = 0;
+  @State isLoading: boolean  = true;
 
   // @Consume isPopupVisible: boolean;
   // @State showCompletedTasks: boolean = false
-  aboutToAppear(){
-    this.loadProjects()
+  async aboutToAppear(){
+    this.isLoading = true
+    await this.loadProjects()
+    hilog.debug(0x001,'ProjectView',`project for taskids: ${this.projects}`)
   }
 
   async loadProjects() {
+    this.isLoading = true
     try {
       this.projects = await this.gtdController.getAllProjects();
-      this.gtdController.initializeCache();
-
+      await this.gtdController.initializeCache();
+      this.isLoading = false
     } catch (error) {
       console.error('Failed to load projects:', error);
     }
-    await this.gtdController.initializeCache()
+    // await this.gtdController.initializeCache()
 
   }
 
@@ -36,15 +41,20 @@ export  struct ProjectView {
 
 
   build() {
-    List() {
-      ForEach(this.projects, (project: ProjectModel) => {
-        ListItem() {
-          this.ProjectItem(project)
+    if(!this.isLoading) {
+
+      List() {
+        ForEach(this.projects, (project: ProjectModel) => {
+          ListItem() {
+            this.ProjectItem(project)
+          }
         }
-      })
+          , project => `${JSON.stringify(project)}`
+        )
+      }
+      .width('100%')
+      .height('100%')
     }
-    .width('100%')
-    .height('100%')
   }
 
   @Builder ProjectItem(project: ProjectModel) {
@@ -64,10 +74,16 @@ export  struct ProjectView {
       // .height(50)
       .backgroundColor(Color.White)
       .padding({ left: 0, right: 16 })
-      .onClick(() => {
+      .onClick(async () => {
         project.isExpended = !project.isExpended
-        this.projects = [...this.projects]
+        await this.gtdController.updateProject(project)
+        await this.loadProjects()
+        hilog.debug(0x001, 'ProjectView:ProjectItem', `project： ${JSON.stringify(this.projects)}`)
+        this.taskUpdateTrigger++;
+        hilog.debug(0x001, 'ProjectView:ProjectItem', `taskUpdateTrigger： ${JSON.stringify(this.taskUpdateTrigger)}`)
+
       })
+
       if(project.description) {
         Row() {
           Text(project.description)
@@ -89,9 +105,11 @@ export  struct ProjectView {
               ListItem() {
                 TaskItem(this.gtdController.taskCache[taskId],
                   this.gtdController,
-                  () => {
-                    this.loadProjects()
+                  async () => {
+                    await this.loadProjects()
                     this.taskUpdateTrigger++
+                    hilog.debug(0x001, 'ProjectView:ProjectItem', `taskUpdateTrigger:${this.taskUpdateTrigger}`)
+                    hilog.debug(0x001, 'ProjectView:ProjectItem', `taskkey: ${taskId}-${this.gtdController.taskCache[taskId].isCompleted}-${this.taskUpdateTrigger}`)
 
                   })
               }
