@@ -76,6 +76,7 @@ export class DatabaseGTDDataSource implements GTDDataSource {
   }
 
   async addProject(project: ProjectModel): Promise<ProjectModel> {
+    hilog.debug(0x003, 'Database', `ADD PROJECTS： ${JSON.stringify(project)}`)
     const db = await this.dbService.initDatabase();
     const valuesBucket = this.projectToValuesBucket(project);
     hilog.debug(0x003, 'Database', `ADD PROJECTS： ${JSON.stringify(valuesBucket)}`)
@@ -124,18 +125,9 @@ export class DatabaseGTDDataSource implements GTDDataSource {
     const valuesBucket = this.contextToValuesBucket(context);
     hilog.debug(0x003, 'Database', `valuesBucket ${JSON.stringify(valuesBucket)}`)
 
-      await db.insert('Contexts', valuesBucket, (err, rowId) => {
-        if (err) {
-          hilog.debug(0x003, 'Database', `Failed to insert data. Code:${err.code}, message:${err.message}`);
-          return;
-        }
-        console.info(`Succeeded in inserting data. rowId:${rowId}`);
+    await db.insert('Contexts', valuesBucket)
 
-      });
       // hilog.debug(0x003, 'Database', `insertId: ${insertId}`)
-
-
-
     return context
   }
 

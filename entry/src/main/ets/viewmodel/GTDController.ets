@@ -49,7 +49,7 @@ export class GTDController {
       reminders.forEach(reminder => {
         this.reminderCache[reminder.id] = reminder;
       });
-
+      await this.recalculateContextTaskIds()
       console.log(' initialized successfully');
     } catch (error) {
       console.error('Error initializing :', error);
@@ -242,7 +242,9 @@ export class GTDController {
 
   async createProject(project: Omit<ProjectModel, 'id'>): Promise<ProjectModel> {
     const newProject: ProjectModel = { ...project, id: 0 };
+    hilog.debug(0x003, 'Database', `${JSON.stringify(newProject)}`);
     const prj = await this.dataSource.addProject(newProject);
+    hilog.debug(0x003, 'Database', `${JSON.stringify(prj)}`);
     this.notifyObservers();
     return prj
   }
@@ -288,15 +290,21 @@ export class GTDController {
   async createContext(context: Omit<ContextModel, 'id'>): Promise<ContextModel> {
     const newContext: ContextModel = { ...context, id: 0 };
     hilog.debug(0x003, 'GTDController',`${JSON.stringify(newContext)}`)
-    return this.dataSource.addContext(newContext);
+    const result = await this.dataSource.addContext(newContext);
+    this.notifyObservers()
+    return result
   }
 
   async updateContext(context: ContextModel): Promise<ContextModel> {
-    return this.dataSource.updateContext(context);
+    const result = await this.dataSource.updateContext(context);
+    this.notifyObservers()
+    return result
   }
 
   async deleteContext(contextId: number): Promise<boolean> {
-    return this.dataSource.deleteContext(contextId);
+    const result = await this.dataSource.deleteContext(contextId);
+    this.notifyObservers()
+    return result
   }
 
   // Reminder methods

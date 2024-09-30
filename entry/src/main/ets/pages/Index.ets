@@ -105,6 +105,7 @@ struct Index {
       await this.gtdController.initializeCache()
 
 
+
       this.filterTasks(stringToDate(this.selectedDateString));
       this.taskUpdateTrigger++
 
@@ -164,7 +165,6 @@ struct Index {
         const createdProject = await this.gtdController.createProject(newProject);
         this.projects = await this.gtdController.getAllProjects()
 
-        this.isAddingProject = false;
       } catch (error) {
         console.error('Failed to create project:', error);
         // 可以在这里添加错误处理，比如显示一个提示
@@ -178,7 +178,7 @@ struct Index {
         const newContext: ContextModel = {
           id: Date.now(), // 临时使用时间戳作为ID，实际应该由后端生成
           name: this.newContextName.trim(),
-          description: this.newProjectDescription.trim(),
+          description: this.newContextDescription.trim(),
           isExpended: false, // 新创建的项目默认不展开
         };
         const createdContext = await this.gtdController.createContext(newContext);
@@ -336,6 +336,9 @@ struct Index {
                   },
                   onSubmit: () => {
                     this.createNewProject();
+                    this.newProjectName = ''
+                    this.newProjectDescription = ''
+                    this.isAddingProject = false;
                   }
                 })
 
@@ -409,6 +412,8 @@ struct Index {
                   },
                   onSubmit: () => {
                     this.createNewContext();
+                    this.newContextName = ''
+                    this.newContextDescription = ''
                     this.isAddingContext = false;
                   }
                 })
