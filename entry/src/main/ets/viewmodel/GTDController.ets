@@ -208,9 +208,26 @@ export class GTDController {
 
   async deleteProject(projectId: number): Promise<boolean> {
     const prjBool = await this.dataSource.deleteProject(projectId);
+    let  result = false;
+    if(prjBool) {
+      await this.deleteTasksByProjectId(projectId)
+      result = true;
+    }
+
     this.notifyObservers();
-    return prjBool
+    return result
   }
+
+  async deleteTasksByProjectId(projectId: number): Promise<void> {
+    const tasks = await this.getTasksByProject(projectId)
+    for (const task of tasks) {
+      task.projectId = -1;
+      const updated = await this.dataSource.updateTask(task);
+      if (!updated) {
+        throw new Error(`Failed to update task ${task.id}`);
+      }
+    }
+}
 
   // Context methods
   async getAllContexts(): Promise<ContextModel[]> {

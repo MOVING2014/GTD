@@ -16,6 +16,7 @@ export struct AddTaskComponent {
   private context: Context;
   @State keyboardHeight: number = 0;
   @State componentElevation: number = 0;
+  @Link projects:ProjectModel[];
 
 
   @State title: string = '';

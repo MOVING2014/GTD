@@ -379,6 +379,7 @@ struct Index {
 
           AddTaskComponent({
             context: getContext(this),
+            projects: $projects,
             onConfirm: async (record: TaskModel, isUpdate: boolean) => {
               if (isUpdate) {
                 const updatedTask = await this.gtdController.updateTask(record);
