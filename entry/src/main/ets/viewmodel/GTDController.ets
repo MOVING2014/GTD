@@ -195,15 +195,21 @@ export class GTDController {
 
   async createProject(project: Omit<ProjectModel, 'id'>): Promise<ProjectModel> {
     const newProject: ProjectModel = { ...project, id: 0 };
-    return this.dataSource.addProject(newProject);
+    const prj = await this.dataSource.addProject(newProject);
+    this.notifyObservers();
+    return prj
   }
 
   async updateProject(project: ProjectModel): Promise<ProjectModel> {
-    return this.dataSource.updateProject(project);
+    const prj = await this.dataSource.updateProject(project);
+    this.notifyObservers();
+    return prj
   }
 
   async deleteProject(projectId: number): Promise<boolean> {
-    return this.dataSource.deleteProject(projectId);
+    const prjBool = await this.dataSource.deleteProject(projectId);
+    this.notifyObservers();
+    return prjBool
   }
 
   // Context methods

@@ -14,6 +14,7 @@ import { ProjectView } from '../components/ProjectView';
 import { WeekView } from '../components/Calendar';
 import { InboxView } from '../components/InBoxView';
 import { isSameDay, stringToDate } from '../common/utils';
+import { NewProjectForm } from '../components/AddProject';
 
 @Entry
 @Component
@@ -49,10 +50,11 @@ struct Index {
 
 
 
-  aboutToAppear() {
-
+  async aboutToAppear() {
+    this.isLoading = true;
     this.gtdController.addObserver(()=>this.loadTasks())
-    this.loadTasks();
+    await this.loadTasks();
+    this.isLoading = false;
 
 
     // 获取当前窗口
@@ -87,9 +89,9 @@ struct Index {
   }
 
   async loadTasks() {
-    this.isLoading = true
+
     try {
-      this.isLoading = true
+
       this.tasks = await this.gtdController.getAllTasks();
       hilog.debug(0x001,'tasksload',`tasksload:  ${JSON.stringify(this.tasks)}`)
       this.projects = await this.gtdController.getAllProjects()
@@ -101,8 +103,6 @@ struct Index {
 
     } catch (error) {
       console.error('Failed to load tasks:', error);
-    }finally {
-      this.isLoading = false;
     }
 
 
@@ -196,249 +196,235 @@ struct Index {
 
   build() {
 
-    // if(this.isLoading) {
-    //   Column() {
-    //     LoadingProgress()
-    //       .color(Color.Green)
-    //       .width(50)
-    //       .height(50)
-    //     Text('加载中...')
-    //       .fontSize(16)
-    //       .margin({ top: 20 })
-    //   }
-    //   .width('100%')
-    //   .height('100%')
-    //   .justifyContent(FlexAlign.Center)
-    // }else  if(!this.isLoading){
+    if(this.isLoading) {
+      Column() {
+        LoadingProgress()
+          .color(Color.Green)
+          .width(50)
+          .height(50)
+        Text('加载中...')
+          .fontSize(16)
+          .margin({ top: 20 })
+      }
+      .width('100%')
+      .height('100%')
+      .justifyContent(FlexAlign.Center)
+    }else  if(!this.isLoading) {
 
 
-    Stack({ alignContent: Alignment.BottomEnd }) {
-      Tabs({ barPosition: BarPosition.End, controller: this.tabsController }) {
+      Stack({ alignContent: Alignment.BottomEnd }) {
+        Tabs({ barPosition: BarPosition.End, controller: this.tabsController }) {
 
-        TabContent() {
-          // 收集
-          Column() {
+          TabContent() {
+            // 收集
+            Column() {
 
-            Text("收集")
-              .fontSize(24)
-              .fontWeight(FontWeight.Medium)
-              .padding({ top: 20, bottom: 10 })
-
-            InboxView({
-              tasks: $tasks
-            })
-
-
-          }
-          .width('95%')
-          .layoutWeight(1)
-          .height('100%')
-          .alignItems(HorizontalAlign.Start) // 添加这一行
-
-        }
-        .tabBar(this.TabBuilder("收集箱", 0, "📥"))
-
-        TabContent() {
-          Column() {
-
-
-
-            Text("待办事项")
-              .fontSize(24)
-              .fontWeight(FontWeight.Medium)
-              .padding({ top: 20, bottom: 10 })
-
-            WeekView({
-              tasks: $tasks,
-              onDateSelect: this.handleDateSelect.bind(this) })
-
-            TaskList({
-              tasks: $filteredTasks
-            })
-
-
-          }
-          .width('95%')
-          .layoutWeight(1)
-          .height('100%')
-          .alignItems(HorizontalAlign.Start) // 添加这一行
-
-
-        }
-        .tabBar(this.TabBuilder("日历", 1, "📅"))
-
-
-        TabContent() {
-          // 项目页面内容
-
-          Column() {
-            Row() {
-              Text('项目')
+              Text("收集")
                 .fontSize(24)
-                .fontWeight(FontWeight.Bold)
-                .margin({ left: 16 })
+                .fontWeight(FontWeight.Medium)
+                .padding({ top: 20, bottom: 10 })
 
-              Blank()  // 用于将按钮推到右边
-
-              Button({ type: ButtonType.Circle, stateEffect: true }) {
-                Text('+++')
-                  .width(24)
-                  .height(24)
-              }
-              .width(40)
-              .height(40)
-              .margin({ right: 16 })
-              .onClick(() => {
-                this.isAddingProject = true
+              InboxView({
+                tasks: $tasks
               })
+
+
             }
-            .width('100%')
-            .height(60)
-            .backgroundColor('#F5F5F5')
-            .padding({ left: 16, right: 16 })
+            .width('95%')
+            .layoutWeight(1)
+            .height('100%')
+            .alignItems(HorizontalAlign.Start) // 添加这一行
 
-            if (this.isAddingProject) {
-              Column() {
-                TextInput({ placeholder: '新项目名称' })
-                  .width('100%')
-                  .height(40)
-                  .onChange((value: string) => {
-                    this.newProjectName = value;
-                  })
-                  .margin({bottom:3})
-                TextInput({ placeholder: '备注/项目目标？' })
-                  .width('100%')
-                  .height(40)
-                  .onChange((value: string) => {
-                    this.newProjectDescription = value;
-                  })
-                  .margin({bottom:3})
-                Row(){
-                  Button('取消')
-                    .onClick(() => {
-                      this.isAddingProject = false;
-                    })
-                  Button('添加')
-                    .onClick(() => {
-                      this.createNewProject();
-                    })
-                }.justifyContent(FlexAlign.SpaceBetween)
-                .width('60%')
+          }
+          .tabBar(this.TabBuilder("收集箱", 0, "📥"))
 
+          TabContent() {
+            Column() {
+
+
+              Text("预测")
+                .fontSize(24)
+                .fontWeight(FontWeight.Medium)
+                .padding({ top: 20, bottom: 10 })
+
+              WeekView({
+                tasks: $tasks,
+                onDateSelect: this.handleDateSelect.bind(this) })
+
+              TaskList({
+                tasks: $filteredTasks
+              })
+
+
+            }
+            .width('95%')
+            .layoutWeight(1)
+            .height('100%')
+            .alignItems(HorizontalAlign.Start) // 添加这一行
+
+
+          }
+          .tabBar(this.TabBuilder("预测", 1, "📅"))
+
+
+          TabContent() {
+            // 项目页面内容
+
+            Column() {
+              Row() {
+                Text('项目')
+                  .fontSize(24)
+                  .fontWeight(FontWeight.Bold)
+                  .margin({ left: 16 })
+
+                Blank() // 用于将按钮推到右边
+
+                Button({ type: ButtonType.Circle, stateEffect: true }) {
+                  Text('+++')
+                    .width(24)
+                    .height(24)
+                }
+                .width(40)
+                .height(40)
+                .margin({ right: 16 })
+                .onClick(() => {
+                  this.isAddingProject = true
+                })
               }
               .width('100%')
-              .padding(16)
-              .backgroundColor(Color.White)
+              .height(60)
+              .backgroundColor('#F5F5F5')
+              .padding({ left: 16, right: 16 })
+
+              if (this.isAddingProject) {
+                  NewProjectForm({
+                    newProjectName: this.newProjectName,
+                    newProjectDescription: this.newProjectDescription,
+                    onNewProjectNameChange: (value: string) => {
+                      this.newProjectName = value;
+                    },
+                    onNewProjectDescriptionChange: (value: string) => {
+                      this.newProjectDescription = value;
+                    },
+                    onCancel: () => {
+                      this.isAddingProject = false;
+                    },
+                    onSubmit: () => {
+                      this.createNewProject();
+                    }
+                  })
+
+              }
+
+              ProjectView({
+                projects: $projects
+              })
+
+
             }
-
-            ProjectView({
-              projects:$projects
-            })
-
-
-          }
-          .width('95%')
-          .layoutWeight(1)
-          .height('100%')
-          .alignItems(HorizontalAlign.Start) // 添加这一行
-
-
-        }
-        .tabBar(this.TabBuilder("项目", 2, "📁"))
-
-        TabContent() {
-          // Context页面内容
-          Text("Context")
-            .fontSize(50)
-            .fontWeight(FontWeight.Bold)
-        }
-        .tabBar(this.TabBuilder("Context", 3, "🏷️"))
-
-        TabContent() {
-          // Flagged页面内容
-          Column() {
-
-            Text("星标")
-              .fontSize(24)
-              .fontWeight(FontWeight.Medium)
-              .padding({ top: 20, bottom: 10 })
-
-            FlaggedItem({
-              tasks: $tasks
-            })
+            .width('95%')
+            .layoutWeight(1)
+            .height('100%')
+            .alignItems(HorizontalAlign.Start) // 添加这一行
 
 
           }
-          .width('95%')
-          .layoutWeight(1)
-          .height('100%')
-          .alignItems(HorizontalAlign.Start) // 添加这一行
+          .tabBar(this.TabBuilder("项目", 2, "📁"))
 
-        }
-        .tabBar(this.TabBuilder("Flagged", 4, "🚩"))
-      }
-      .onChange((index: number) => {
-        this.currentIndex = index;
-      })
-      .height('100%')
+          TabContent() {
+            // Context页面内容
+            Text("Context")
+              .fontSize(50)
+              .fontWeight(FontWeight.Bold)
+          }
+          .tabBar(this.TabBuilder("Context", 3, "🏷️"))
+
+          TabContent() {
+            // Flagged页面内容
+            Column() {
+
+              Text("星标")
+                .fontSize(24)
+                .fontWeight(FontWeight.Medium)
+                .padding({ top: 20, bottom: 10 })
+
+              FlaggedItem({
+                tasks: $tasks
+              })
 
 
-      if (this.isPopupVisible) {
-        Column()
-          .width('100%')
-          .height('100%')
-          .backgroundColor('#1a000000')
-          .onAppear(() => this.showPopup())
-          .onClick(() => this.hidePopup())
-
-
-        AddTaskComponent({
-          context: getContext(this),
-          onConfirm: async (record: TaskModel, isUpdate: boolean) => {
-            if (isUpdate) {
-              const updatedTask = await this.gtdController.updateTask(record);
-              hilog.debug(0x009, 'indexPage', `record: ${JSON.stringify(record)}`)
-              hilog.debug(0x009, 'indexPage', `${JSON.stringify(updatedTask)}`)
-            } else {
-              await this.gtdController.createTask(record);
             }
+            .width('95%')
+            .layoutWeight(1)
+            .height('100%')
+            .alignItems(HorizontalAlign.Start) // 添加这一行
 
-            this.loadTasks();
-            this.hidePopup();
-            hilog.debug(0x009, 'indexPage', `tasksload:  ${JSON.stringify(this.tasks[1])}`)
-
-          },
-          onCancel: () => {
-            this.hidePopup();
           }
-        })
-          .translate({ y: this.popupTranslateY })
-          .position({y:440}) // TODO: 需要搞清楚为什么是440
-
-      }
-
-
-      if (!this.isPopupVisible) {
-        Button({ type: ButtonType.Capsule, stateEffect: true }) {
-          Text("+")
-            .fontColor(Color.White)
-            .fontWeight(FontWeight.Bold)
-            .fontSize(30)
-            .textAlign(TextAlign.Center)
+          .tabBar(this.TabBuilder("Flagged", 4, "🚩"))
         }
-        .width(60)
-        .height(36)
-        .margin({ bottom: 80, right: 20 })
-        .onClick(() => {
-          this.currentEditingTask = { id: -1, name: '', createdDate: new Date(0), isCompleted: false };
-          this.showPopup()
+        .onChange((index: number) => {
+          this.currentIndex = index;
         })
+        .height('100%')
+
+
+        if (this.isPopupVisible) {
+          Column()
+            .width('100%')
+            .height('100%')
+            .backgroundColor('#1a000000')
+            .onAppear(() => this.showPopup())
+            .onClick(() => this.hidePopup())
+
+
+          AddTaskComponent({
+            context: getContext(this),
+            onConfirm: async (record: TaskModel, isUpdate: boolean) => {
+              if (isUpdate) {
+                const updatedTask = await this.gtdController.updateTask(record);
+                hilog.debug(0x009, 'indexPage', `record: ${JSON.stringify(record)}`)
+                hilog.debug(0x009, 'indexPage', `${JSON.stringify(updatedTask)}`)
+              } else {
+                await this.gtdController.createTask(record);
+              }
+
+              this.loadTasks();
+              this.hidePopup();
+              hilog.debug(0x009, 'indexPage', `tasksload:  ${JSON.stringify(this.tasks[1])}`)
+
+            },
+            onCancel: () => {
+              this.hidePopup();
+            }
+          })
+            .translate({ y: this.popupTranslateY })
+            .position({ y: 440 }) // TODO: 需要搞清楚为什么是440
+
+        }
+
+
+        if (!this.isPopupVisible) {
+          Button({ type: ButtonType.Capsule, stateEffect: true }) {
+            Text("+")
+              .fontColor(Color.White)
+              .fontWeight(FontWeight.Bold)
+              .fontSize(30)
+              .textAlign(TextAlign.Center)
+          }
+          .width(60)
+          .height(36)
+          .margin({ bottom: 80, right: 20 })
+          .onClick(() => {
+            this.currentEditingTask = { id: -1, name: '', createdDate: new Date(0), isCompleted: false };
+            this.showPopup()
+          })
+        }
+
       }
+      .width('100%')
+      // .height(this.StackHeight)
+      // .margin({top:this.topMargin})
 
     }
-    .width('100%')
-    // .height(this.StackHeight)
-    // .margin({top:this.topMargin})
-    // }
   }
 }

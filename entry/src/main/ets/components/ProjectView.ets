@@ -4,6 +4,7 @@ import { TaskItem } from '../common/CommonBuilders';
 import { Constants } from '../common/Constants';
 import { TaskModel, ProjectModel } from '../models/IModels';
 import { GTDController } from '../viewmodel/GTDController';
+import { NewProjectForm } from './AddProject';
 
 
 
@@ -17,6 +18,9 @@ export  struct ProjectView {
   @Consume isPopupVisible: boolean;
   @State showCompletedTasks: boolean = false
   @Consume currentEditingTask: TaskModel;
+
+  @State isEditingProject: boolean = false;
+  @State editingProject: ProjectModel | undefined = undefined;
 
 
 
@@ -36,22 +40,16 @@ export  struct ProjectView {
 
   }
 
+  async updateNewProject() {
 
+      try {
+        const createdProject = await this.gtdController.updateProject(this.editingProject);
+        this.projects = await this.gtdController.getAllProjects()
 
-
-  build() {
-
-      List() {
-        ForEach(this.projects, (project: ProjectModel) => {
-          ListItem() {
-            this.ProjectItem(project)
-          }
-        }
-          , project => `${JSON.stringify(project)}—${this.taskUpdateTrigger}`
-        )
+      } catch (error) {
+        console.error('Failed to create project:', error);
+        // 可以在这里添加错误处理，比如显示一个提示
       }
-      .width('100%')
-      .height('100%')
 
   }
 
@@ -91,6 +89,44 @@ export  struct ProjectView {
 
     }
   }
+
+
+  @Builder projectEnd(project: ProjectModel) {
+    Row() {
+      Button({ type: ButtonType.Circle }) {
+        Text('EDIT')
+          .fontColor(Color.White)
+          .width(40)
+          .height(40)
+          .textAlign(TextAlign.Center)
+      }
+      .backgroundColor(Constants.editButtonColor)
+      .onClick(async  () => {
+        this.isEditingProject = true;
+        this.editingProject = project
+        this.taskUpdateTrigger ++;
+        // hilog.debug(0x009,'TaskItem',`TaskItem load tasks ${JSON.stringify(this.tasks[1])}`)
+
+      })
+      .margin({right:10})
+      // 侧滑后尾端出现的组件
+      Button({ type: ButtonType.Circle }) {
+        Text('DEL')
+          .fontColor(Color.White)
+          .width(40)
+          .height(40)
+          .textAlign(TextAlign.Center)
+      }
+      .backgroundColor(Constants.deleteButtonColor)
+      .onClick(async () => {
+        await this.gtdController.deleteProject(project.id)
+        this.taskUpdateTrigger ++;
+
+      })
+
+    }
+  }
+
 
 
   @Builder ProjectItem(project: ProjectModel) {
@@ -158,5 +194,51 @@ export  struct ProjectView {
       }
     }
   }
+
+
+  build() {
+
+      List() {
+        ForEach(this.projects, (project: ProjectModel) => {
+          ListItem() {
+            Column() {
+
+              this.ProjectItem(project)
+              if (this.isEditingProject && project.id === this.editingProject.id) {
+                NewProjectForm({
+                  newProjectName: this.editingProject.name,
+                  newProjectDescription: this.editingProject.description,
+                  onNewProjectNameChange: (value: string) => {
+                    this.editingProject.name = value;
+                  },
+                  onNewProjectDescriptionChange: (value: string) => {
+                    this.editingProject.description = value;
+                  },
+                  onCancel: () => {
+                    this.isEditingProject = false;
+                  },
+                  onSubmit: () => {
+                    this.updateNewProject();
+                    this.isEditingProject = false;
+                  }
+                })
+
+              }
+
+            }
+          }
+          .swipeAction({ end: this.projectEnd(project) })
+
+        }
+          , project => `${JSON.stringify(project)}—${this.taskUpdateTrigger}`
+        )
+      }
+      .width('100%')
+      .height('100%')
+
+  }
+
+
+
 
 }
