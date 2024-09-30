@@ -59,12 +59,14 @@ export  class MockGTDDataSource implements GTDDataSource {
     {
       id: 1,
       name: "💼办公室",
-      description: "在办公室可以完成的任务"
+      description: "在办公室可以完成的任务",
+      isExpended: false
     },
     {
       id: 2,
       name: "🏠家",
-      description: "在家可以完成的任务"
+      description: "在家可以完成的任务",
+      isExpended: false
     }
   ];
 

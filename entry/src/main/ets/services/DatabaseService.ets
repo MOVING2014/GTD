@@ -63,9 +63,16 @@ export class DatabaseService {
       const SQL_CREATE_CONTEXTS =`CREATE TABLE IF NOT EXISTS Contexts (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           name TEXT NOT NULL,
-          description TEXT
+          description TEXT,
+          isExpended INTEGER
       )`;
-      await this.rdbStore.executeSql(SQL_CREATE_CONTEXTS);
+      await this.rdbStore.executeSql(SQL_CREATE_CONTEXTS)
+      //
+      // const SQL_ADD_ISEXPANDED_COLUMN = `ALTER TABLE Contexts ADD COLUMN isExpanded INTEGER DEFAULT 0`
+      // await this.rdbStore.executeSql(SQL_ADD_ISEXPANDED_COLUMN);
+
+
+
 
       const SQL_CREATE_REMINDERS = `CREATE TABLE IF NOT EXISTS Reminders (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -79,7 +86,7 @@ export class DatabaseService {
       hilog.info(0x0000, 'DatabaseService', 'Database initialized successfully');
       return this.rdbStore;
     } catch (error) {
-      hilog.error(0x0000, 'DatabaseService', `Error initializing database: ${error}`);
+      hilog.error(0x0000, 'DatabaseService', `Error initializing database: ${JSON.stringify(error)}`);
       throw error;
     }
   }

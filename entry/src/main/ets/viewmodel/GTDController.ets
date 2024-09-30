@@ -10,6 +10,7 @@ export class GTDController {
   contextCache: Record<number, ContextModel | null> = {};
   reminderCache: Record<number, ReminderModel |null> = {};
   taskCache: Record<number, TaskModel |null> = {};
+  contextIDTaskIDMap2Array = new Map<number, number[]>();
 
   private observers: Set<() => void> = new Set();
 
@@ -117,6 +118,52 @@ export class GTDController {
 
     // this.notifyObservers();
   }
+
+
+
+  private async recalculateContextTaskIds() {
+    const context = await this.getAllContexts();
+    const tasks = await this.getAllTasks();
+
+    const contextIDTaskIDMap = new Map<number, Set<number>>();
+
+    // 初始化每个项目的任务 ID 集合
+    context.forEach(context => {
+      contextIDTaskIDMap.set(context.id, new Set<number>());
+    });
+
+    // 遍历所有任务，将任务 ID 添加到相应的项目中
+    tasks.forEach(task => {
+      if (task.contextId !== undefined && task.contextId !== null &&
+            task.id !== undefined && task.id !== null) {
+        let taskIds = contextIDTaskIDMap.get(task.contextId);
+        if (!taskIds) {
+          taskIds = new Set<number>();
+        }
+        taskIds.add(task.id);
+        contextIDTaskIDMap.set(task.contextId, taskIds);
+
+        // 添加日志来检查是否成功添加
+        // hilog.debug(0x001, 'ProjectView:GTDController', `Added task ${task.id} to project ${task.projectId}. Current tasks: ${Array.from(taskIds).join(', ')}`);
+      } else {
+        // hilog.warn(0x001, 'ProjectView:GTDController', `Invalid task or project ID: ${JSON.stringify(task)}`);
+      }
+    });
+    // 更新缓存
+    context.forEach(context => {
+      this.contextCache[context.id] = context;
+      const taskIDs = contextIDTaskIDMap.get(context.id);
+      if(taskIDs){
+        this.contextIDTaskIDMap2Array[context.id] = Array.from(taskIDs)
+      }else {
+        this.contextIDTaskIDMap2Array[context.id] = []
+      }
+
+    });
+
+    // this.notifyObservers();
+  }
+
 
   // Task methods
   async getAllTasks(): Promise<TaskModel[]> {
@@ -240,6 +287,7 @@ export class GTDController {
 
   async createContext(context: Omit<ContextModel, 'id'>): Promise<ContextModel> {
     const newContext: ContextModel = { ...context, id: 0 };
+    hilog.debug(0x003, 'GTDController',`${JSON.stringify(newContext)}`)
     return this.dataSource.addContext(newContext);
   }
 

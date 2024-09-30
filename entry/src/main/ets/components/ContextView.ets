@@ -3,54 +3,53 @@ import hilog from '@ohos.hilog';
 import { describe } from '@ohos/hypium';
 import { TaskItem } from '../common/CommonBuilders';
 import { Constants } from '../common/Constants';
-import { TaskModel, ProjectModel } from '../models/IModels';
+import { TaskModel, ProjectModel, ContextModel } from '../models/IModels';
 import { GTDController } from '../viewmodel/GTDController';
+import { NewContextForm } from './AddContext';
 import { NewProjectForm } from './AddProject';
 
 
 
 @Component
-export  struct ProjectView {
+export  struct ContextView {
   @Consume gtdController: GTDController;
   // @Link tasks: TaskModel[];
-  @Link  projects: ProjectModel[];
-  @State loadingProjects: Set<number> = new Set()
+  @Link  tasks: TaskModel[];
+  @Link  contexts: ContextModel[];
   @Consume taskUpdateTrigger: number;
   @Consume isPopupVisible: boolean;
   @State showCompletedTasks: boolean = false
   @Consume currentEditingTask: TaskModel;
 
-  @State isEditingProject: boolean = false;
-  @State editingProject: ProjectModel | undefined = undefined;
+  @State isEditingContext: boolean = false;
+  @State editingContext: ContextModel | undefined = undefined;
 
 
 
   async aboutToAppear(){
-    await this.loadProjects()
-    hilog.debug(0x001,'ProjectView',`project for taskids: ${this.projects}`)
+    await this.loadContexts()
+    hilog.debug(0x001,'ContextView',`Context for taskids: ${this.contexts}`)
   }
 
-  async loadProjects() {
+  async loadContexts() {
     try {
-      this.projects = await this.gtdController.getAllProjects();
+      this.contexts = await this.gtdController.getAllContexts();
       await this.gtdController.initializeCache();
     } catch (error) {
-      console.error('Failed to load projects:', error);
+      console.error('Failed to load contexts:', error);
     }
-    // await this.gtdController.initializeCache()
 
   }
 
-  async updateNewProject() {
+  async updateNewContext() {
 
-      try {
-        const createdProject = await this.gtdController.updateProject(this.editingProject);
-        this.projects = await this.gtdController.getAllProjects()
+    try {
+      const createdContext = await this.gtdController.updateContext(this.editingContext);
+      this.contexts = await this.gtdController.getAllContexts()
 
-      } catch (error) {
-        console.error('Failed to create project:', error);
-        // 可以在这里添加错误处理，比如显示一个提示
-      }
+    } catch (error) {
+      console.error('Failed to create project:', error);
+    }
 
   }
 
@@ -92,7 +91,7 @@ export  struct ProjectView {
   }
 
 
-  @Builder projectEnd(project: ProjectModel) {
+  @Builder contextEnd(context: ContextModel) {
     Row() {
       Button({ type: ButtonType.Circle }) {
         Text('EDIT')
@@ -103,8 +102,8 @@ export  struct ProjectView {
       }
       .backgroundColor(Constants.editButtonColor)
       .onClick(async  () => {
-        this.isEditingProject = true;
-        this.editingProject = project
+        this.isEditingContext = true;
+        this.editingContext = context
         this.taskUpdateTrigger ++;
         // hilog.debug(0x009,'TaskItem',`TaskItem load tasks ${JSON.stringify(this.tasks[1])}`)
 
@@ -120,7 +119,7 @@ export  struct ProjectView {
       }
       .backgroundColor(Constants.deleteButtonColor)
       .onClick(async () => {
-        await this.gtdController.deleteProject(project.id)
+        await this.gtdController.deleteContext(context.id)
         this.taskUpdateTrigger ++;
 
       })
@@ -130,13 +129,13 @@ export  struct ProjectView {
 
 
 
-  @Builder ProjectItem(project: ProjectModel) {
+  @Builder contextItem(context: ContextModel) {
     Column() {
       Row() {
-        Text(project.isExpended ? '📂' : '📁')  // 文件夹emoji
+        Text(context.isExpended ? '📂' : '📁')  // 文件夹emoji
           .fontSize(24)
           .margin({ right: 10 })
-        Text(project.name)
+        Text(context.name)
           .fontSize(20)
           .fontWeight(FontWeight.Medium)
           .fontColor(Color.Gray)
@@ -144,22 +143,21 @@ export  struct ProjectView {
 
       }
       .width('100%')
-      // .height(50)
       .backgroundColor(Color.White)
       .padding({ left: 0, right: 16 })
       .onClick(async () => {
-        project.isExpended = !project.isExpended
-        await this.gtdController.updateProject(project)
-        await this.loadProjects()
-        hilog.debug(0x001, 'ProjectView:ProjectItem', `project： ${JSON.stringify(this.projects)}`)
+        context.isExpended = !context.isExpended
+        await this.gtdController.updateContext(context)
+        await this.loadContexts()
+        hilog.debug(0x001, 'ContextView:ContextItem', `Context： ${JSON.stringify(this.contexts)}`)
         this.taskUpdateTrigger++;
-        hilog.debug(0x001, 'ProjectView:ProjectItem', `taskUpdateTrigger： ${JSON.stringify(this.taskUpdateTrigger)}`)
+        hilog.debug(0x001, 'ContextView:ContextItem', `taskUpdateTrigger： ${JSON.stringify(this.taskUpdateTrigger)}`)
 
       })
 
-      if(project.description) {
+      if(context.description) {
         Row() {
-          Text(project.description)
+          Text(context.description)
             .fontSize(16)
             .fontWeight(FontWeight.Regular)
             .fontColor(Color.Grey)
@@ -169,20 +167,20 @@ export  struct ProjectView {
         } .width('100%')
       }
 
-      if (project.isExpended) {
-        if (project.taskIds) {
+      if (context.isExpended) {
+        if (this.gtdController.contextIDTaskIDMap2Array[context.id]) {
           List() {
-            ForEach(project.taskIds.filter(
+            ForEach(this.gtdController.contextIDTaskIDMap2Array[context.id].filter(
               taskID => !this.gtdController.taskCache[taskID].isCompleted
             ), (taskId: number) => {
               ListItem() {
                 TaskItem(this.gtdController.taskCache[taskId],
                   this.gtdController,
                   async () => {
-                    await this.loadProjects()
+                    await this.loadContexts()
                     this.taskUpdateTrigger++
-                    hilog.debug(0x001, 'ProjectView:ProjectItem', `taskUpdateTrigger:${this.taskUpdateTrigger}`)
-                    hilog.debug(0x001, 'ProjectView:ProjectItem', `taskkey: ${taskId}-${this.gtdController.taskCache[taskId].isCompleted}-${this.taskUpdateTrigger}`)
+                    hilog.debug(0x001, 'ContextView', `taskUpdateTrigger:${this.taskUpdateTrigger}`)
+                    hilog.debug(0x001, 'ContextView', `taskkey: ${taskId}-${this.gtdController.taskCache[taskId].isCompleted}-${this.taskUpdateTrigger}`)
 
                   })
               }
@@ -199,50 +197,45 @@ export  struct ProjectView {
 
   build() {
 
-      List() {
-        ForEach(this.projects, (project: ProjectModel) => {
-          ListItem() {
-            Column() {
+    List() {
+      ForEach(this.contexts, (context: ContextModel) => {
+        ListItem() {
+          Column() {
 
-              this.ProjectItem(project)
-              if (this.isEditingProject && project.id === this.editingProject.id) {
-                NewProjectForm({
-                  newProjectName: this.editingProject.name,
-                  newProjectDescription: this.editingProject.description,
-                  title: this.editingProject.name,
-                  description: this.editingProject.description,
-                  onNewProjectNameChange: (value: string) => {
-                    this.editingProject.name = value;
-                  },
-                  onNewProjectDescriptionChange: (value: string) => {
-                    this.editingProject.description = value;
-                  },
-                  onCancel: () => {
-                    this.isEditingProject = false;
-                  },
-                  onSubmit: () => {
-                    this.updateNewProject();
-                    this.isEditingProject = false;
-                  }
-                })
-
-              }
+            this.contextItem(context)
+            if (this.isEditingContext && context.id === this.editingContext.id) {
+              NewContextForm({
+                newContextName: this.editingContext.name,
+                newContextDescription: this.editingContext.description,
+                title: this.editingContext.name,
+                description: this.editingContext.description,
+                onNewContextNameChange: (value: string) => {
+                  this.editingContext.name = value;
+                },
+                onNewContextDescriptionChange: (value: string) => {
+                  this.editingContext.description = value;
+                },
+                onCancel: () => {
+                  this.isEditingContext = false;
+                },
+                onSubmit: () => {
+                  this.updateNewContext();
+                  this.isEditingContext = false;
+                }
+              })
 
             }
-          }
-          .swipeAction({ end: this.projectEnd(project) })
 
+          }
         }
-          , project => `${JSON.stringify(project)}—${this.taskUpdateTrigger}`
-        )
+        .swipeAction({ end: this.contextEnd(context) })
+
       }
-      .width('100%')
-      .layoutWeight(1)
-      // .height('100%')
+        , context => `${JSON.stringify(context)}—${this.taskUpdateTrigger}`
+      )
+    }
+    .width('100%')
+    .height('100%')
 
   }
-
-
-
-
 }

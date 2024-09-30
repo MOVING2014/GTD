@@ -1,4 +1,4 @@
-import { ProjectModel, TaskModel } from '../models/IModels';
+import { ContextModel, ProjectModel, TaskModel } from '../models/IModels';
 import { GTDController } from '../viewmodel/GTDController';
 import {  TaskList } from '../components/TaskItem'
 import { AddTaskComponent } from '../components/AddTask';
@@ -15,6 +15,8 @@ import { WeekView } from '../components/Calendar';
 import { InboxView } from '../components/InBoxView';
 import { isSameDay, stringToDate } from '../common/utils';
 import { NewProjectForm } from '../components/AddProject';
+import { ContextView } from '../components/ContextView';
+import { NewContextForm } from '../components/AddContext';
 
 @Entry
 @Component
@@ -29,6 +31,7 @@ struct Index {
   @State currentIndex: number = 0;
   @State tasks: TaskModel[] = [];
   @State projects: ProjectModel[] = [];
+  @State contexts: ContextModel[] = [];
 
   @State popupTranslateY: number = 100;
 
@@ -39,8 +42,11 @@ struct Index {
   @State topMargin: number = 0;
 
   @State private isAddingProject: boolean = false;
+  @State private isAddingContext: boolean = false;
   @State private newProjectName: string = '';
   @State private newProjectDescription: string = '';
+  @State private newContextName: string = '';
+  @State private newContextDescription: string = '';
 
   @State isLoading: boolean = true;
   @State selectedDateString: string = new Date().toString();
@@ -95,6 +101,7 @@ struct Index {
       this.tasks = await this.gtdController.getAllTasks();
       hilog.debug(0x001,'tasksload',`tasksload:  ${JSON.stringify(this.tasks)}`)
       this.projects = await this.gtdController.getAllProjects()
+      this.contexts = await this.gtdController.getAllContexts()
       await this.gtdController.initializeCache()
 
 
@@ -165,7 +172,24 @@ struct Index {
     }
   }
 
+  async createNewContext() {
+    if (this.newContextName.trim()) {
+      try {
+        const newContext: ContextModel = {
+          id: Date.now(), // 临时使用时间戳作为ID，实际应该由后端生成
+          name: this.newContextName.trim(),
+          description: this.newProjectDescription.trim(),
+          isExpended: false, // 新创建的项目默认不展开
+        };
+        const createdContext = await this.gtdController.createContext(newContext);
+        this.contexts = await this.gtdController.getAllContexts()
 
+      } catch (error) {
+        console.error('Failed to create project:', error);
+        // 可以在这里添加错误处理，比如显示一个提示
+      }
+    }
+  }
 
   handleDateSelect(date: Date |'') {
     if(date === ''){
@@ -269,7 +293,6 @@ struct Index {
 
           TabContent() {
             // 项目页面内容
-
             Column() {
               Row() {
                 Text('项目')
@@ -296,11 +319,6 @@ struct Index {
               .backgroundColor('#F5F5F5')
               .padding({ left: 16, right: 16 })
 
-
-              ProjectView({
-                projects: $projects
-              })
-
               if (this.isAddingProject) {
                 NewProjectForm({
                   newProjectName: this.newProjectName,
@@ -323,6 +341,88 @@ struct Index {
 
               }
 
+              if(this.projects) {
+                ProjectView({
+                  projects: $projects
+                })
+              }
+
+
+
+
+
+
+
+
+
+            }
+            .width('95%')
+            .layoutWeight(1)
+            .height('100%')
+            .alignItems(HorizontalAlign.Start) // 添加这一行
+          }
+          .tabBar(this.TabBuilder("项目", 2, "📁"))
+
+          TabContent() {
+            // Context页面内容
+            Column() {
+              Row() {
+                Text('场景')
+                  .fontSize(24)
+                  .fontWeight(FontWeight.Bold)
+                  .margin({ left: 16 })
+
+                Blank() // 用于将按钮推到右边
+
+                Button({ type: ButtonType.Circle, stateEffect: true }) {
+                  Text('+++')
+                    .width(24)
+                    .height(24)
+                }
+                .width(40)
+                .height(40)
+                .margin({ right: 16 })
+                .onClick(() => {
+                  this.isAddingContext = true
+                })
+              }
+              .width('100%')
+              .height(60)
+              .backgroundColor('#F5F5F5')
+              .padding({ left: 16, right: 16 })
+
+              if(this.isAddingContext) {
+
+                NewContextForm({
+                  newContextName: this.newContextName,
+                  newContextDescription: this.newContextDescription,
+                  title: '',
+                  description: '',
+                  onNewContextNameChange: (value: string) => {
+                    this.newContextName = value;
+                  },
+                  onNewContextDescriptionChange: (value: string) => {
+                    this.newContextDescription = value;
+                  },
+                  onCancel: () => {
+                    this.isAddingContext = false;
+                  },
+                  onSubmit: () => {
+                    this.createNewContext();
+                    this.isAddingContext = false;
+                  }
+                })
+              }
+
+
+              ContextView({
+                tasks: $tasks,
+                contexts: $contexts
+              })
+
+
+
+
 
             }
             .width('95%')
@@ -331,14 +431,8 @@ struct Index {
             .alignItems(HorizontalAlign.Start) // 添加这一行
 
 
-          }
-          .tabBar(this.TabBuilder("项目", 2, "📁"))
 
-          TabContent() {
-            // Context页面内容
-            Text("Context")
-              .fontSize(50)
-              .fontWeight(FontWeight.Bold)
+
           }
           .tabBar(this.TabBuilder("Context", 3, "🏷️"))
 

@@ -25,6 +25,7 @@ export interface ContextModel {
   id: number;
   name: string;
   description?: string;
+  isExpended: boolean;
 }
 
 

@@ -78,6 +78,7 @@ export class DatabaseGTDDataSource implements GTDDataSource {
   async addProject(project: ProjectModel): Promise<ProjectModel> {
     const db = await this.dbService.initDatabase();
     const valuesBucket = this.projectToValuesBucket(project);
+    hilog.debug(0x003, 'Database', `ADD PROJECTS： ${JSON.stringify(valuesBucket)}`)
     const insertId = await db.insert('Projects', valuesBucket);
     return { ...project, id: insertId };
   }
@@ -121,8 +122,21 @@ export class DatabaseGTDDataSource implements GTDDataSource {
   async addContext(context: ContextModel): Promise<ContextModel> {
     const db = await this.dbService.initDatabase();
     const valuesBucket = this.contextToValuesBucket(context);
-    const insertId = await db.insert('Contexts', valuesBucket);
-    return { ...context, id: insertId };
+    hilog.debug(0x003, 'Database', `valuesBucket ${JSON.stringify(valuesBucket)}`)
+
+      await db.insert('Contexts', valuesBucket, (err, rowId) => {
+        if (err) {
+          hilog.debug(0x003, 'Database', `Failed to insert data. Code:${err.code}, message:${err.message}`);
+          return;
+        }
+        console.info(`Succeeded in inserting data. rowId:${rowId}`);
+
+      });
+      // hilog.debug(0x003, 'Database', `insertId: ${insertId}`)
+
+
+
+    return context
   }
 
   async updateContext(context: ContextModel): Promise<ContextModel> {
@@ -283,6 +297,7 @@ export class DatabaseGTDDataSource implements GTDDataSource {
       id: resultSet.getLong(resultSet.getColumnIndex('id')),
       name: resultSet.getString(resultSet.getColumnIndex('name')),
       description: resultSet.getString(resultSet.getColumnIndex('description')),
+      isExpended: resultSet.getLong(resultSet.getColumnIndex('isExpended')) === 1
     };
   }
 
@@ -290,6 +305,7 @@ export class DatabaseGTDDataSource implements GTDDataSource {
     return {
       name: context.name,
       description: context.description,
+      isExpended: context.isExpended ? 1:0
     };
   }
 
