@@ -1,5 +1,6 @@
 // import { TaskData, ProjectData } from './DataTypes'
 import hilog from '@ohos.hilog';
+import { describe } from '@ohos/hypium';
 import { TaskItem } from '../common/CommonBuilders';
 import { Constants } from '../common/Constants';
 import { TaskModel, ProjectModel } from '../models/IModels';
@@ -208,6 +209,8 @@ export  struct ProjectView {
                 NewProjectForm({
                   newProjectName: this.editingProject.name,
                   newProjectDescription: this.editingProject.description,
+                  title: this.editingProject.name,
+                  description: this.editingProject.description,
                   onNewProjectNameChange: (value: string) => {
                     this.editingProject.name = value;
                   },

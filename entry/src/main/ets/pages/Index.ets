@@ -296,29 +296,32 @@ struct Index {
               .backgroundColor('#F5F5F5')
               .padding({ left: 16, right: 16 })
 
-              if (this.isAddingProject) {
-                  NewProjectForm({
-                    newProjectName: this.newProjectName,
-                    newProjectDescription: this.newProjectDescription,
-                    onNewProjectNameChange: (value: string) => {
-                      this.newProjectName = value;
-                    },
-                    onNewProjectDescriptionChange: (value: string) => {
-                      this.newProjectDescription = value;
-                    },
-                    onCancel: () => {
-                      this.isAddingProject = false;
-                    },
-                    onSubmit: () => {
-                      this.createNewProject();
-                    }
-                  })
-
-              }
 
               ProjectView({
                 projects: $projects
               })
+
+              if (this.isAddingProject) {
+                NewProjectForm({
+                  newProjectName: this.newProjectName,
+                  newProjectDescription: this.newProjectDescription,
+                  title:'',
+                  description:'',
+                  onNewProjectNameChange: (value: string) => {
+                    this.newProjectName = value;
+                  },
+                  onNewProjectDescriptionChange: (value: string) => {
+                    this.newProjectDescription = value;
+                  },
+                  onCancel: () => {
+                    this.isAddingProject = false;
+                  },
+                  onSubmit: () => {
+                    this.createNewProject();
+                  }
+                })
+
+              }
 
 
             }
