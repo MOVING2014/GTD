@@ -90,6 +90,82 @@ export  struct ContextView {
     }
   }
 
+  @Builder itemStart(record: TaskModel) {
+    Row() {
+
+      Button({ type: ButtonType.Normal }) {
+        Text(record.flagged ? '-🌟' : '🌟' )
+          .fontColor(Color.White)
+          .width(45)
+          .height('80%')
+          .textAlign(TextAlign.Center)
+      }
+      .backgroundColor(Constants.deleteButtonColor)
+      .onClick(async () => {
+        // this.controller.deleteMoodRecord(record.id)
+        this.currentEditingTask = record;
+        this.currentEditingTask.flagged = !this.currentEditingTask.flagged
+        await this.gtdController.updateTask(this.currentEditingTask)
+
+      })
+      Button({ type: ButtonType.Normal }) {
+        Text('0d')
+          .fontColor(Color.White)
+          .width(45)
+          .height('80%')
+          .textAlign(TextAlign.Center)
+      }
+      .backgroundColor(Constants.editButtonColor)
+      .margin({right:1})
+      .onClick(() => {
+        this.currentEditingTask = record;
+        const today = new Date()
+        this.currentEditingTask.dueDate = today
+        this.currentEditingTask.dueDate.setDate(today.getDate() + 0)
+        this.gtdController.updateTask(this.currentEditingTask)
+      })
+
+      Button({ type: ButtonType.Normal }) {
+        Text('+1d')
+          .fontColor(Color.White)
+          .width(45)
+          .height('80%')
+          .textAlign(TextAlign.Center)
+      }
+      .backgroundColor(Constants.editButtonColor)
+      .margin({right:1})
+
+      .onClick(() => {
+        this.currentEditingTask = record;
+        const today = new Date()
+        this.currentEditingTask.dueDate = today
+        this.currentEditingTask.dueDate.setDate(today.getDate() + 1)
+        this.gtdController.updateTask(this.currentEditingTask)
+      })
+      Button({ type: ButtonType.Normal }) {
+        Text('+7d')
+          .fontColor(Color.White)
+          .width(45)
+          .height('80%')
+          .textAlign(TextAlign.Center)
+      }
+      .backgroundColor(Constants.editButtonColor)
+      .margin({right:1})
+
+      .onClick(() => {
+        this.currentEditingTask = record;
+        const today = new Date()
+        this.currentEditingTask.dueDate = today
+        this.currentEditingTask.dueDate.setDate(today.getDate() + 7)
+        this.gtdController.updateTask(this.currentEditingTask)
+      })
+
+
+
+    }
+  }
+
+
 
   @Builder contextEnd(context: ContextModel) {
     Row() {
@@ -169,6 +245,14 @@ export  struct ContextView {
 
       if (context.isExpended) {
         if (this.gtdController.contextIDTaskIDMap2Array[context.id]) {
+          if(context.isExpended){
+            Divider()
+              .strokeWidth(Constants.dividerWidth)
+              .width('95%')
+              .color(Constants.dividerColor)
+              .margin({bottom:Constants.taskMarginBottom})
+          }
+
           List() {
             ForEach(this.gtdController.contextIDTaskIDMap2Array[context.id].filter(
               taskID => !this.gtdController.taskCache[taskID].isCompleted
@@ -184,7 +268,8 @@ export  struct ContextView {
 
                   })
               }
-              .swipeAction({ end: this.itemEnd(this.gtdController.taskCache[taskId]) })
+              .swipeAction({ end: this.itemEnd(this.gtdController.taskCache[taskId]),
+              start: this.itemStart(this.gtdController.taskCache[taskId])})
             },   taskId => `${taskId}-${this.gtdController.taskCache[taskId].isCompleted}-${this.taskUpdateTrigger}`
             )
           }

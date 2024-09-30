@@ -1,6 +1,7 @@
 
 import { TaskModel } from '../models/IModels'
 import { GTDController } from '../viewmodel/GTDController'
+import { Constants } from './Constants'
 import { formatDate, formatDateToChinese, overDue } from './utils'
 
 
@@ -13,7 +14,7 @@ import { formatDate, formatDateToChinese, overDue } from './utils'
         .backgroundColor('#F0F0F0')
         .borderRadius(4)
           // .padding({ left: 6, right: 6, top: 2, bottom: 2 })
-        .margin({ right: 8, top:5 })
+        .margin({ right: 8, top: Constants.labelMarginTop })
     }
   }
 }
@@ -27,7 +28,7 @@ import { formatDate, formatDateToChinese, overDue } from './utils'
         .fontColor('#666666')
         .backgroundColor('#F0F0F0')
         .borderRadius(4)
-        .margin({ right: 8, top:5 })
+        .margin({ right: 8, top: Constants.labelMarginTop })
     }
   }
 }
@@ -56,7 +57,7 @@ import { formatDate, formatDateToChinese, overDue } from './utils'
         .fontSize(18)
         .fontColor(task.isCompleted ? '#888888' : '#000000')
         // .fontWeight(task.flagged? FontWeight.Bold : FontWeight.Bold)
-        .fontWeight(FontWeight.Bold)
+        .fontWeight(Constants.taskFontWeight)
         .decoration({ type: task.isCompleted ? TextDecorationType.LineThrough : TextDecorationType.None })
         .width('85%')
         .alignSelf(ItemAlign.Start)
@@ -72,16 +73,16 @@ import { formatDate, formatDateToChinese, overDue } from './utils'
           Text(formatDateToChinese(task.dueDate, false))
             .fontSize(16)
             .fontColor(overDue(task.dueDate) ? '#FF0000' : '#888888')
-            .margin({ top: 5 })
+            .margin({ top: Constants.labelMarginTop })
         }
       }
     }
     .alignItems(HorizontalAlign.Start)
   }
   .width('100%')
-  .padding(10)
+  .padding({left:5, right:5})
   .borderRadius(8)
   .backgroundColor(Color.White)
-  .margin({ bottom: 10 })
+  .margin({ bottom: Constants.taskMarginBottom, top:Constants.taskMarginBottom })
   .alignItems(VerticalAlign.Top)
 }

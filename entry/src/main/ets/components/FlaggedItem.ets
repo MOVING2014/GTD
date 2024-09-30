@@ -69,6 +69,80 @@ export struct FlaggedItem {
     }
   }
 
+  @Builder itemStart(record: TaskModel) {
+    Row() {
+
+      Button({ type: ButtonType.Normal }) {
+        Text(record.flagged ? '-🌟' : '🌟' )
+          .fontColor(Color.White)
+          .width(45)
+          .height('80%')
+          .textAlign(TextAlign.Center)
+      }
+      .backgroundColor(Constants.deleteButtonColor)
+      .onClick(async () => {
+        // this.controller.deleteMoodRecord(record.id)
+        this.currentEditingTask = record;
+        this.currentEditingTask.flagged = !this.currentEditingTask.flagged
+        await this.gtdController.updateTask(this.currentEditingTask)
+
+      })
+      Button({ type: ButtonType.Normal }) {
+        Text('0d')
+          .fontColor(Color.White)
+          .width(45)
+          .height('80%')
+          .textAlign(TextAlign.Center)
+      }
+      .backgroundColor(Constants.editButtonColor)
+      .margin({right:1})
+      .onClick(() => {
+        this.currentEditingTask = record;
+        const today = new Date()
+        this.currentEditingTask.dueDate = today
+        this.currentEditingTask.dueDate.setDate(today.getDate() + 0)
+        this.gtdController.updateTask(this.currentEditingTask)
+      })
+
+      Button({ type: ButtonType.Normal }) {
+        Text('+1d')
+          .fontColor(Color.White)
+          .width(45)
+          .height('80%')
+          .textAlign(TextAlign.Center)
+      }
+      .backgroundColor(Constants.editButtonColor)
+      .margin({right:1})
+
+      .onClick(() => {
+        this.currentEditingTask = record;
+        const today = new Date()
+        this.currentEditingTask.dueDate = today
+        this.currentEditingTask.dueDate.setDate(today.getDate() + 1)
+        this.gtdController.updateTask(this.currentEditingTask)
+      })
+      Button({ type: ButtonType.Normal }) {
+        Text('+7d')
+          .fontColor(Color.White)
+          .width(45)
+          .height('80%')
+          .textAlign(TextAlign.Center)
+      }
+      .backgroundColor(Constants.editButtonColor)
+      .margin({right:1})
+
+      .onClick(() => {
+        this.currentEditingTask = record;
+        const today = new Date()
+        this.currentEditingTask.dueDate = today
+        this.currentEditingTask.dueDate.setDate(today.getDate() + 7)
+        this.gtdController.updateTask(this.currentEditingTask)
+      })
+
+
+
+    }
+  }
 
 
 
@@ -83,7 +157,7 @@ export struct FlaggedItem {
             ListItem() {
               TaskItem(task, this.gtdController, () => this.loadTasks())
             }
-            .swipeAction({ end: this.itemEnd(task) })
+            .swipeAction({ end: this.itemEnd(task), start: this.itemStart(task) })
           }
           // , (task: TaskModel ,index:number) => {return index + '_' +  task.isCompleted.toString();}
         )
@@ -124,7 +198,7 @@ export struct FlaggedItem {
               ListItem() {
                 TaskItem(task, this.gtdController, () => this.loadTasks())
               }
-              .swipeAction({ end: this.itemEnd(task) })
+              .swipeAction({ end: this.itemEnd(task), start: this.itemStart(task) })
             })
         }
         .width('100%')

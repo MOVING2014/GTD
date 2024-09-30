@@ -23,8 +23,18 @@ export class Constants {
   static readonly calendarViewBg:  string = '#08000000';
 
 
-  //回顾颜色
+  //回顾颜色 Review模块
   static readonly reviewCompleted:  string = '#72800000';
+
+  //Divider的颜色
+  static readonly dividerColor:  string = '#56003a80';
+  static readonly dividerWidth:  number = 0.7;
+
+
+  //TaskItem 相关
+  static readonly taskFontWeight: number = FontWeight.Medium;
+  static readonly labelMarginTop: number = 3;
+  static readonly taskMarginBottom: number = 5;
 
   // Font sizes
   static readonly fontSizeSmall: number = 12;
