@@ -249,6 +249,7 @@ export class DatabaseGTDDataSource implements GTDDataSource {
       description: resultSet.getString(resultSet.getColumnIndex('description')),
       taskIds: this.deSeri(resultSet.getString(resultSet.getColumnIndex('taskIds'))),
       isExpended: resultSet.getLong(resultSet.getColumnIndex('isExpended')) === 1,
+      reviewedDate: resultSet.getLong(resultSet.getColumnIndex('reviewedDate')) ? new Date(resultSet.getLong(resultSet.getColumnIndex('reviewedDate'))) : undefined,
     };
     hilog.debug(0x000, ' DatabaseGTDDataSource:resultSetToProject', `project : ${JSON.stringify(project)}}`)
 
@@ -270,7 +271,8 @@ export class DatabaseGTDDataSource implements GTDDataSource {
       name: project.name,
       description: project.description,
       taskIds: project.taskIds ? this.seri(project.taskIds) : "[]" ,
-      isExpended: project.isExpended ? 1:0
+      isExpended: project.isExpended ? 1:0,
+      reviewedDate: project.reviewedDate?.getTime()
     };
     hilog.debug(0x000, ' DatabaseGTDDataSource:projectToValuesBucket', `valueBUcket: ${JSON.stringify(valueBucket)}}`)
     return valueBucket

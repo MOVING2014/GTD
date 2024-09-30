@@ -19,6 +19,7 @@ export interface ProjectModel {
   description?: string;
   taskIds?: number[];
   isExpended: boolean;
+  reviewedDate?: Date;
 }
 
 export interface ContextModel {

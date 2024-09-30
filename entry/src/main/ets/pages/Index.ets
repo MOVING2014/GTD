@@ -17,6 +17,7 @@ import { isSameDay, stringToDate } from '../common/utils';
 import { NewProjectForm } from '../components/AddProject';
 import { ContextView } from '../components/ContextView';
 import { NewContextForm } from '../components/AddContext';
+import { ReviewView } from '../components/ReviewView';
 
 @Entry
 @Component
@@ -159,8 +160,9 @@ struct Index {
           id: Date.now(), // 临时使用时间戳作为ID，实际应该由后端生成
           name: this.newProjectName.trim(),
           description: this.newProjectDescription.trim(),
+          taskIds: [], // 新项目默认没有任务
           isExpended: false, // 新创建的项目默认不展开
-          taskIds: [] // 新项目默认没有任务
+
         };
         const createdProject = await this.gtdController.createProject(newProject);
         this.projects = await this.gtdController.getAllProjects()
@@ -455,6 +457,7 @@ struct Index {
               })
 
 
+
             }
             .width('95%')
             .layoutWeight(1)
@@ -462,7 +465,28 @@ struct Index {
             .alignItems(HorizontalAlign.Start) // 添加这一行
 
           }
-          .tabBar(this.TabBuilder("Flagged", 4, "🚩"))
+          .tabBar(this.TabBuilder("已标注", 4, "🌟"))
+
+          TabContent() {
+            // Flagged页面内容
+            Column() {
+
+              ReviewView({
+                projects:$projects
+              })
+
+
+            }
+            .width('95%')
+            .layoutWeight(1)
+            .height('100%')
+            .alignItems(HorizontalAlign.Start) // 添加这一行
+
+          }
+          .tabBar(this.TabBuilder("回顾", 5, "♾"))
+
+
+
         }
         .onChange((index: number) => {
           this.currentIndex = index;
@@ -507,16 +531,16 @@ struct Index {
 
 
         if (!this.isPopupVisible) {
-          Button({ type: ButtonType.Capsule, stateEffect: true }) {
+          Button({ type: ButtonType.Circle, stateEffect: true }) {
             Text("+")
               .fontColor(Color.White)
               .fontWeight(FontWeight.Bold)
               .fontSize(30)
               .textAlign(TextAlign.Center)
           }
-          .width(60)
-          .height(36)
-          .margin({ bottom: 80, right: 20 })
+          .width(40)
+          .height(40)
+          .margin({ bottom: 160, right: 20 })
           .onClick(() => {
             this.currentEditingTask = { id: -1, name: '', createdDate: new Date(0), isCompleted: false };
             this.showPopup()

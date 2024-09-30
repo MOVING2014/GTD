@@ -56,9 +56,13 @@ export class DatabaseService {
           name TEXT NOT NULL,
           description TEXT,
           taskIds TEXT,
-          isExpended INTEGER
+          isExpended INTEGER,
+          reviewedDate INTEGER
       )`;
       await this.rdbStore.executeSql(SQL_CREATE_PROJECTS);
+      // const SQL_ADD_reviewedDate_COLUMN = `ALTER TABLE Projects ADD COLUMN reviewedDate INTEGER `
+      // await this.rdbStore.executeSql(SQL_ADD_reviewedDate_COLUMN);
+
 
       const SQL_CREATE_CONTEXTS =`CREATE TABLE IF NOT EXISTS Contexts (
           id INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -22,6 +22,10 @@ export class Constants {
   static readonly calendarViewBackgroundExpense:  string = '#1a76a471';
   static readonly calendarViewBg:  string = '#08000000';
 
+
+  //回顾颜色
+  static readonly reviewCompleted:  string = '#72800000';
+
   // Font sizes
   static readonly fontSizeSmall: number = 12;
   static readonly fontSizeMedium: number = 16;
