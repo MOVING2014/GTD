@@ -34,7 +34,7 @@ export class Constants {
   //TaskItem 相关
   static readonly taskFontWeight: number = FontWeight.Medium;
   static readonly labelMarginTop: number = 3;
-  static readonly taskMarginBottom: number = 5;
+  static readonly taskMarginBottom: number = 8;
 
   // Font sizes
   static readonly fontSizeSmall: number = 12;

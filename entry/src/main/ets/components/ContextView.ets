@@ -54,36 +54,109 @@ export  struct ContextView {
   }
 
 
+  @Builder ProjectMenuBuilder() {
+    Menu() {
+
+      MenuItem({ content: '无项目' })
+        .onClick(async () => {
+          // this.selectedProject = { id: -1, name : '' }
+          this.currentEditingTask.projectId = -1
+          await this.gtdController.updateTask(this.currentEditingTask)
+          // 这里可以添加清除选择后的逻辑
+        })
+
+      ForEach(Object.values(this.gtdController.projectCache), (project: ProjectModel) => {
+        MenuItem({ content: project.name })
+          .onClick(async () => {
+            // this.selectedProject = project
+            this.currentEditingTask.projectId = project.id
+            await this.gtdController.updateTask(this.currentEditingTask)
+            // 这里可以添加选择 context 后的逻辑，比如更新任务的 context
+          })
+
+      })
+    }
+  }
+  @Builder contextMenuBuilder() {
+    Menu() {
+      MenuItem({ content: '无场景' })
+        .onClick(async () => {
+          // this.selectedContext = { id: -1, name : '' }
+          this.currentEditingTask.contextId = -1
+          await this.gtdController.updateTask(this.currentEditingTask)
+          // 这里可以添加清除选择后的逻辑
+        })
+
+      ForEach(Object.values(this.gtdController.contextCache), (context: ContextModel) => {
+        MenuItem({ content: context.name })
+          .onClick(async () => {
+            // this.selectedContext = context
+            this.currentEditingTask.contextId = context.id
+            await this.gtdController.updateTask(this.currentEditingTask)
+            // 这里可以添加选择 context 后的逻辑，比如更新任务的 context
+          })
+
+      })
+    }
+  }
   @Builder itemEnd(record: TaskModel) {
     Row() {
-      Button({ type: ButtonType.Circle }) {
+      Button({ type: ButtonType.Normal }) {
+        Text('项目')
+          .fontColor(Color.White)
+          .width(40)
+          .height('80%')
+          .textAlign(TextAlign.Center)
+      }
+      .backgroundColor(Constants.editButtonColor)
+      .onClick(() => {
+        this.currentEditingTask = record;
+      })
+      .margin({right:1})
+      .bindMenu(this.ProjectMenuBuilder)
+
+      Button({ type: ButtonType.Normal }) {
+        Text('场景')
+          .fontColor(Color.White)
+          .width(40)
+          .height('80%')
+          .textAlign(TextAlign.Center)
+      }
+      .backgroundColor(Constants.editButtonColor)
+      .onClick(() => {
+        this.currentEditingTask = record;
+      })
+      .margin({right:1})
+      .bindMenu(this.contextMenuBuilder)
+
+
+      Button({ type: ButtonType.Normal }) {
         Text('EDIT')
           .fontColor(Color.White)
           .width(40)
-          .height(40)
+          .height('80%')
           .textAlign(TextAlign.Center)
       }
       .backgroundColor(Constants.editButtonColor)
       .onClick(() => {
         this.currentEditingTask = record;
         this.isPopupVisible = true;
-        // hilog.debug(0x009,'TaskItem',`TaskItem load tasks ${JSON.stringify(this.tasks[1])}`)
-
+        // this.loadTasks()
       })
-      .margin({right:10})
+      .margin({right:1})
       // 侧滑后尾端出现的组件
-      Button({ type: ButtonType.Circle }) {
+      Button({ type: ButtonType.Normal }) {
         Text('DEL')
           .fontColor(Color.White)
           .width(40)
-          .height(40)
+          .height('80%')
           .textAlign(TextAlign.Center)
       }
       .backgroundColor(Constants.deleteButtonColor)
       .onClick(async () => {
         // this.controller.deleteMoodRecord(record.id)
         await this.gtdController.deleteTask(record.id)
-
+        // this.loadTasks()
 
       })
 
