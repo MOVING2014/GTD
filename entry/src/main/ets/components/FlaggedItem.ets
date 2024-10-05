@@ -225,7 +225,13 @@ export struct FlaggedItem {
     Column() {
       List() {
         ForEach(this.tasks
-          .filter(task => !task.isCompleted && task.flagged),
+          .filter(task => !task.isCompleted && task.flagged)
+          .sort((a, b) => {
+            const dateA = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
+            const dateB = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
+            return dateA - dateB;
+          }),
+
           (task: TaskModel, index: number) => {
             ListItem() {
               TaskItem(task, this.gtdController, () => this.loadTasks())

@@ -33,6 +33,17 @@ export  struct ProjectView {
   async loadProjects() {
     try {
       this.projects = await this.gtdController.getAllProjects();
+
+      // 对每个项目的任务进行排序
+      this.projects.forEach(project => {
+        if (project.taskIds) {
+          project.taskIds.sort((a, b) => {
+            const dateA = this.gtdController.taskCache[a].dueDate ? new Date(this.gtdController.taskCache[a].dueDate).getTime() : Infinity;
+            const dateB = this.gtdController.taskCache[b].dueDate ? new Date(this.gtdController.taskCache[b].dueDate).getTime() : Infinity;
+            return dateA - dateB;
+          });
+        }
+      });
       await this.gtdController.initializeCache();
     } catch (error) {
       console.error('Failed to load projects:', error);
@@ -332,7 +343,14 @@ export  struct ProjectView {
           List() {
             ForEach(project.taskIds.filter(
               taskID => !this.gtdController.taskCache[taskID].isCompleted
-            ), (taskId: number) => {
+            )
+              .sort((a, b) => {
+                const dateA = this.gtdController.taskCache[a].dueDate ? new Date(this.gtdController.taskCache[a].dueDate).getTime() : Infinity;
+                const dateB = this.gtdController.taskCache[b].dueDate ? new Date(this.gtdController.taskCache[b].dueDate).getTime() : Infinity;
+                return dateA - dateB;
+              })
+
+            , (taskId: number) => {
               ListItem() {
                 TaskItem(this.gtdController.taskCache[taskId],
                   this.gtdController,

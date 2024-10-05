@@ -329,7 +329,16 @@ export  struct ContextView {
           List() {
             ForEach(this.gtdController.contextIDTaskIDMap2Array[context.id].filter(
               taskID => !this.gtdController.taskCache[taskID].isCompleted
-            ), (taskId: number) => {
+            )
+              .sort((a, b) => {
+              const taskA = this.gtdController.taskCache[a];
+              const taskB = this.gtdController.taskCache[b];
+              const dateA = taskA.dueDate ? new Date(taskA.dueDate).getTime() : Infinity;
+              const dateB = taskB.dueDate ? new Date(taskB.dueDate).getTime() : Infinity;
+              return dateA - dateB;
+            })
+
+              , (taskId: number) => {
               ListItem() {
                 TaskItem(this.gtdController.taskCache[taskId],
                   this.gtdController,
