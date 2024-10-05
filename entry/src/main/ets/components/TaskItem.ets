@@ -246,7 +246,12 @@ aboutToAppear(){
     Column() {
       List() {
         ForEach(this.tasks
-         .filter(task => !task.isCompleted),
+         .filter(task => !task.isCompleted)
+          .sort((a, b) => {
+            const dateA = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
+            const dateB = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
+            return dateA - dateB;
+          }),
           (task: TaskModel, index: number) => {
           ListItem() {
 

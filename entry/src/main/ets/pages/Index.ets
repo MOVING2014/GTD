@@ -205,17 +205,50 @@ struct Index {
     // hilog.debug(0x001, 'TaskList', `Selected date: ${date.toDateString()}`);
   }
 
+  // private filterTasks(selectedDate: Date) {
+  //   // 确保选中的日期只包含年月日信息，不包含时分秒
+  //   const startOfDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+  //   const endOfDay = new Date(startOfDay);
+  //   endOfDay.setDate(endOfDay.getDate() + 1);
+  //
+  //   this.filteredTasks = this.tasks.filter(task => {
+  //     const taskDate = new Date(task.dueDate);
+  //     return isSameDay(taskDate, selectedDate)
+  //   });
+  //
+  // }
+
+
   private filterTasks(selectedDate: Date) {
-    // 确保选中的日期只包含年月日信息，不包含时分秒
-    const startOfDay = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
-    const endOfDay = new Date(startOfDay);
-    endOfDay.setDate(endOfDay.getDate() + 1);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const startOfSelectedDay = new Date(selectedDate);
+    startOfSelectedDay.setHours(0, 0, 0, 0);
+
+    const endOfSelectedDay = new Date(startOfSelectedDay);
+    endOfSelectedDay.setHours(23, 59, 59, 999);
+
+    const futureDateThreshold = new Date(today);
+    futureDateThreshold.setDate(today.getDate() + 5);
+    futureDateThreshold.setHours(0, 0, 0, 0);
+
 
     this.filteredTasks = this.tasks.filter(task => {
+      if (!task.dueDate) return false;
       const taskDate = new Date(task.dueDate);
-      return isSameDay(taskDate, selectedDate)
-    });
 
+      if (endOfSelectedDay.getTime() < today.getTime()) {
+        // 对于昨天及之前的日期
+        return taskDate.getTime() <= endOfSelectedDay.getTime();
+      } else if (startOfSelectedDay.getTime() >= futureDateThreshold.getTime()) {
+        // 对于今天之后的第5天及以后的日期
+        return taskDate.getTime() >= futureDateThreshold.getTime();
+      } else {
+        // 对于今天及将来的日期
+        return isSameDay(taskDate, selectedDate);
+      }
+    });
   }
 
 

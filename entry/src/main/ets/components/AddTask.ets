@@ -242,7 +242,7 @@ export struct AddTaskComponent {
         }
         .padding({ left:8, right: 8 })
       }
-      .height(30)
+      .height(40)
       .backgroundColor(Color.Blue)
       .borderRadius(5)
       .onClick(() => {
@@ -322,7 +322,7 @@ export struct AddTaskComponent {
           text: this.title
         })
           .defaultFocus(true)
-          .width('100%')
+          .width('85%')
           .height(40)
           .borderRadius(0)
           .onChange((value: string) => {
@@ -333,10 +333,15 @@ export struct AddTaskComponent {
             sendEventByKey('taskinput',10,'弹出键盘')
             // sendEventByKey('123',10,'弹出键盘')
           })
+          .margin({right:5})
+        Blank()
+
+        this.Sender()
 
       }
       .alignSelf(ItemAlign.Start)
       .margin({bottom:10})
+      .width('100%')
 
       Row() {
         // 1. 日期时间
@@ -349,7 +354,7 @@ export struct AddTaskComponent {
         this.ContextSelector()
         this.ProjectSelector()
         Blank()
-        this.Sender()
+
 
       }
       .width('100%')

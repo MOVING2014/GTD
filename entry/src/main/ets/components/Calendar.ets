@@ -37,6 +37,29 @@ export struct WeekView {
     date.getFullYear() === today.getFullYear();
   }
 
+  private isYesterday(date: Date): boolean {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    return date.getDate() === yesterday.getDate() &&
+    date.getMonth() === yesterday.getMonth() &&
+    date.getFullYear() === yesterday.getFullYear();
+  }
+
+
+  private isFuture(date: Date): boolean {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() + 5);
+
+    return date.getDate() === yesterday.getDate() &&
+    date.getMonth() === yesterday.getMonth() &&
+    date.getFullYear() === yesterday.getFullYear();
+  }
+
+
+
   private isSelected(date: Date): boolean {
     if (!this.selectedDateString) return false;
     return date.getDate() === stringToDate(this.selectedDateString).getDate() &&
@@ -44,15 +67,48 @@ export struct WeekView {
     date.getFullYear() === stringToDate(this.selectedDateString).getFullYear();
   }
 
-  private getUncompletedTaskCount(date: Date): number {
-     let len = this.tasks.filter(task => {
-      if(!task.dueDate) return false;
-      const taskDate = task.dueDate;
-      // hilog.debug(0x002,'Calendar',`taskid:${task.title} taskDate:${taskDate},date: ${date}, ${isSameDay(date, taskDate).toString()}`);
-      return isSameDay(date, taskDate) && !task.isCompleted; // 假设任务模型有 completed 属性
-    }).length;
+  // private getUncompletedTaskCount(date: Date): number {
+  //    let len = this.tasks.filter(task => {
+  //     if(!task.dueDate) return false;
+  //     const taskDate = task.dueDate;
+  //     // hilog.debug(0x002,'Calendar',`taskid:${task.title} taskDate:${taskDate},date: ${date}, ${isSameDay(date, taskDate).toString()}`);
+  //     return isSameDay(date, taskDate) && !task.isCompleted; // 假设任务模型有 completed 属性
+  //   }).length;
+  //
+  //   return len
+  // }
+  //
 
-    return len
+  private getUncompletedTaskCount(date: Date): number {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const targetDate = new Date(date);
+    targetDate.setHours(23, 59, 59, 999);
+
+    const futureDateThreshold = new Date(today);
+    futureDateThreshold.setDate(today.getDate() + 5);
+    futureDateThreshold.setHours(0, 0, 0, 0);
+
+    if (targetDate.getTime() < today.getTime()) {
+      hilog.debug(0x001, 'Calendar', `target Date: ${targetDate.toString()}/ today: ${today.toString()}`)
+    }
+
+    return this.tasks.filter(task => {
+      if (!task.dueDate) return false;
+      const taskDate = new Date(task.dueDate);
+
+      if (targetDate.getTime() < today.getTime()) {
+        // 对于昨天及之前的日期
+        return taskDate.getTime() <= targetDate.getTime() && !task.isCompleted;
+      } else if (targetDate.getTime() >= futureDateThreshold.getTime()) {
+      // 对于今天之后的第5天及以后的日期
+      return taskDate.getTime() >= futureDateThreshold.getTime() && !task.isCompleted;
+      } else {
+        // 对于今天及将来的日期
+        return isSameDay(taskDate, targetDate) && !task.isCompleted;
+      }
+    }).length;
   }
 
 
@@ -62,7 +118,7 @@ export struct WeekView {
       ForEach(this.recentDays, (day, index) => {
         Column() {
           Row() {
-            Text(this.isToday(day) ? '今天' : this.formatDayOfWeek(day))
+            Text(this.isToday(day) ? '今天' : (this.isYesterday(day)?  '过去' : this.isFuture(day)?  '未来' : this.formatDayOfWeek(day)) )
               .fontSize(10)
               .fontColor(this.isToday(day) ? '#b9990000' : '#666666')
               .fontWeight(FontWeight.Bold)

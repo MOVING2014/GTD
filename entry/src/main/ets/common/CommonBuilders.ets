@@ -63,19 +63,23 @@ import { formatDate, formatDateToChinese, overDue } from './utils'
         .alignSelf(ItemAlign.Start)
 
       Row() {
+
         if (task.projectId) {
           ProjectLabel(task.projectId, gtdController)
         }
         if (task.contextId) {
           ContextLabel(task.contextId, gtdController)
         }
+        Blank()
         if (task.dueDate) {
           Text(formatDateToChinese(task.dueDate, true))
             .fontSize(16)
             .fontColor(overDue(task.dueDate) ? '#FF0000' : '#888888')
             .margin({ top: Constants.labelMarginTop })
+            .textAlign(TextAlign.Start)
         }
       }
+      .width('90%')
     }
     .alignItems(HorizontalAlign.Start)
   }
