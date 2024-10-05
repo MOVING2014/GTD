@@ -329,6 +329,16 @@ export  struct ProjectView {
           Blank()
 
         } .width('100%')
+        .onClick(async () => {
+          project.isExpended = !project.isExpended
+          await this.gtdController.updateProject(project)
+          await this.loadProjects()
+          hilog.debug(0x001, 'ProjectView:ProjectItem', `project： ${JSON.stringify(this.projects)}`)
+          this.taskUpdateTrigger++;
+          hilog.debug(0x001, 'ProjectView:ProjectItem', `taskUpdateTrigger： ${JSON.stringify(this.taskUpdateTrigger)}`)
+
+        })
+
       }
 
       if (project.isExpended) {
