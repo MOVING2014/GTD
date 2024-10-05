@@ -70,7 +70,7 @@ import { formatDate, formatDateToChinese, overDue } from './utils'
           ContextLabel(task.contextId, gtdController)
         }
         if (task.dueDate) {
-          Text(formatDateToChinese(task.dueDate, false))
+          Text(formatDateToChinese(task.dueDate, true))
             .fontSize(16)
             .fontColor(overDue(task.dueDate) ? '#FF0000' : '#888888')
             .margin({ top: Constants.labelMarginTop })

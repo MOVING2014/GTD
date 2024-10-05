@@ -95,7 +95,7 @@ export  function formatDateToChinese(date: Date|undefined, withYear: boolean = t
   const month = date.getMonth() + 1; // getMonth() 返回 0-11
   const day = date.getDate();
   if(withYear) {
-    return `${year}年${month.toString()}月${day.toString()}日`;
+    return `${month.toString()}/${day.toString()}/${year}`;
   }else{
     return `${month.toString()}月${day.toString()}日`;
   }
