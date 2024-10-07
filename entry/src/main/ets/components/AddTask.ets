@@ -247,6 +247,9 @@ export struct AddTaskComponent {
       .borderRadius(5)
       .onClick(() => {
         hilog.debug(0x009, 'AddTask', `onclick : ${this.projectId}`)
+        if(this.dueDateString === null || this.dueDateString === '' || this.dueDateString === undefined){
+          this.currentEditingTask.dueDate = null
+        }
         const task: TaskModel = this.currentEditingTask.id != -1
         ? {
             ...this.currentEditingTask,

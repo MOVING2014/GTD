@@ -42,6 +42,7 @@ export class DatabaseGTDDataSource implements GTDDataSource {
   async updateTask(task: TaskModel): Promise<TaskModel> {
     const db = await this.dbService.initDatabase();
     const valuesBucket = this.taskToValuesBucket(task);
+    hilog.debug(0x001, 'EditTasks', `${JSON.stringify(valuesBucket)}`)
     let predicates = new relationalStore.RdbPredicates("Tasks");
     predicates.equalTo("id", `${task.id}`);
     await db.update(valuesBucket, predicates);
@@ -221,7 +222,7 @@ export class DatabaseGTDDataSource implements GTDDataSource {
       title: task.title,
       description: task.description,
       createdDate: task.createdDate.getTime(),
-      dueDate: task.dueDate?.getTime(),
+      dueDate: task.dueDate?.getTime() ? task.dueDate?.getTime() : null,
       priority: task.priority,
       isCompleted: task.isCompleted ? 1 : 0,
       projectId: task.projectId,
