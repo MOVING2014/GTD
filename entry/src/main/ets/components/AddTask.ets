@@ -296,7 +296,7 @@ export struct AddTaskComponent {
       DatePickerDialog.show({
         start: new Date('2023-01-01'),
         end: new Date('2100-12-31'),
-        selected: currentDate,
+        selected: this.currentEditingTask?.dueDate ? this.currentEditingTask?.dueDate : currentDate,
         onAccept: (value: DatePickerResult) => {
           let newDate = new Date(value.year, value.month, value.day);
           // this.dueDateString = formatDateToChinese(newDate);
