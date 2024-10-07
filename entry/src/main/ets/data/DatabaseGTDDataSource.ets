@@ -60,7 +60,7 @@ export class DatabaseGTDDataSource implements GTDDataSource {
   // Project methods
   async getProjects(): Promise<ProjectModel[]> {
     const db = await this.dbService.initDatabase();
-    const sql = 'SELECT * FROM Projects';
+    const sql = 'SELECT * FROM Projects order by name ';
     const resultSet = await db.querySql(sql);
     return this.resultSetToProjects(resultSet);
   }
