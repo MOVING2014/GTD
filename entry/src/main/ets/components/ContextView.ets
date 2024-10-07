@@ -311,6 +311,15 @@ export  struct ContextView {
             .fontWeight(FontWeight.Regular)
             .fontColor(Color.Grey)
             .margin({left:40, bottom:10})
+            .onClick(async () => {
+              context.isExpended = !context.isExpended
+              await this.gtdController.updateContext(context)
+              await this.loadContexts()
+              hilog.debug(0x001, 'ContextView:ContextItem', `Context： ${JSON.stringify(this.contexts)}`)
+              this.taskUpdateTrigger++;
+              hilog.debug(0x001, 'ContextView:ContextItem', `taskUpdateTrigger： ${JSON.stringify(this.taskUpdateTrigger)}`)
+
+            })
           Blank()
 
         } .width('100%')
