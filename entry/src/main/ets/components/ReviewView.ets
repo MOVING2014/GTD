@@ -336,7 +336,7 @@ export  struct ReviewView {
             .margin({ right: 10 })
 
           Button('标记为已回顾')
-            .backgroundColor(Color.Gray)
+            .backgroundColor(Constants.primaryColor)
             .onClick(async () => {
               const reviewDate = new Date()
               this.reviewingProject.reviewedDate = reviewDate
