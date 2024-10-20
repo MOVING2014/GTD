@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "storePassword": "00000018CB24FE3D45A312FE32E7F7EA6EC95181E7F51035AEC82487CAE4D4B5E99B0C149CE1597E",
-          "certpath": "C:/Users/40455/Desktop/证书/debugSign.cer",
+          "storePassword": "00000018F2582F575E1D8CFB577839422820F67D9E290129C62FBD698FC18CFE0E4BAD0A82A90D67",
+          "certpath": "C:/Users/MOVING/Desktop/证书/debugSign.cer",
           "keyAlias": "debugAlias",
-          "keyPassword": "0000001800087E4B6D1829CAF03D033A5848D39471A4ABEF7FB359C24462DDB6EA413C5F251FB5B8",
-          "profile": "C:/Users/40455/Desktop/证书/GTDProfilesDebug.p7b",
+          "keyPassword": "0000001830F462E182DB85B01DBAAD47E3860D5561679E3643BEF6DA61FFE978FA32E3BCDF4967CB",
+          "profile": "C:/Users/MOVING/Desktop/证书/GTDProfilesDebug.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:/Users/40455/Desktop/证书/p12File.p12"
+          "storeFile": "C:/Users/MOVING/Desktop/证书/p12File.p12"
         }
       }
     ],
