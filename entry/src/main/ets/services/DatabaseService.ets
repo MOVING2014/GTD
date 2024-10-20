@@ -108,6 +108,15 @@ export class DatabaseService {
     }
   }
 
+  backupDBDir(): string {
+    if (!this.rdbStore) {
+      throw new Error("Database not initialized");
+      hilog.info(0x001, 'DatabaseDir', 'Database not initialized')
+    }
+      const dbDir = `${getContext(this).databaseDir}/rdb/dbBackup.db`;
+      return dbDir
+  }
+
 
   async  logDatabaseDirContents() {
     // const dbDir = getContext(this).databaseDir;
@@ -124,11 +133,31 @@ export class DatabaseService {
   }
 
 
-  backupDatabase(): void {
+  async backupDatabase(): Promise<void> {
     if (!this.rdbStore) {
       throw new Error("Database not initialized");
       hilog.info(0x001, 'DatabaseDir', 'Database not initialized')
     }
+
+    const dbDir = `${getContext(this).databaseDir}/rdb/dbBackup.db`;
+
+    try {
+      // 检查目录是否存在
+      await fs.access(dbDir);
+
+      // 如果目录存在，尝试删除它
+      try {
+        await fs.rmdir(dbDir);
+        console.info(`目录 ${dbDir} 已成功删除`);
+      } catch (removeError) {
+        console.error(`删除目录 ${dbDir} 失败:`, removeError.message);
+        // 这里可以根据需要处理删除失败的情况
+      }
+    } catch (accessError) {
+      // 如果 access() 抛出错误，说明目录不存在或无法访问
+      console.info(`目录 ${dbDir} 不存在或无法访问，无需删除`);
+    }
+
 
     this.rdbStore.backup('dbBackup.db', (err) => {
       if (err) {

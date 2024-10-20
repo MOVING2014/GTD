@@ -18,6 +18,8 @@ import { NewProjectForm } from '../components/AddProject';
 import { ContextView } from '../components/ContextView';
 import { NewContextForm } from '../components/AddContext';
 import { ReviewView } from '../components/ReviewView';
+import router from '@ohos.router';
+import { Constants } from '../common/Constants';
 
 @Entry
 @Component
@@ -348,6 +350,21 @@ struct Index {
                 .onClick(() => {
                   this.isAddingProject = true
                 })
+
+                Button('配置')
+                  .fontSize(Constants.fontSizeMedium)
+                  .fontWeight(FontWeight.Bold)
+                  .backgroundColor(Constants.textColorSecondary)
+                  .height(30)
+                  .onClick(() => {
+                    router.pushUrl({
+                      url: 'pages/Settings'
+                    });
+                  })
+                  .margin({right:5})
+
+
+
               }
               .width('100%')
               .height(60)
