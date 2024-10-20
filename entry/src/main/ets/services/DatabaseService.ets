@@ -1,6 +1,7 @@
 //services/DatabaseService
 import relationalStore from '@ohos.data.relationalStore';
 import hilog from '@ohos.hilog';
+import fs from '@ohos.file.fs';
 
 export class DatabaseService {
   private static instance: DatabaseService;
@@ -16,10 +17,16 @@ export class DatabaseService {
   }
 
 
+
+
+
   async initDatabase(): Promise<relationalStore.RdbStore> {
     if (this.rdbStore) {
       return this.rdbStore;
     }
+
+
+
 
     try {
       const context = getContext(this);
@@ -88,10 +95,60 @@ export class DatabaseService {
 
 
       hilog.info(0x0000, 'DatabaseService', 'Database initialized successfully');
+
+      // this.backupDatabase()
+      await this.logDatabaseDirContents()
+
+
+
       return this.rdbStore;
     } catch (error) {
       hilog.error(0x0000, 'DatabaseService', `Error initializing database: ${JSON.stringify(error)}`);
       throw error;
     }
   }
+
+
+  async  logDatabaseDirContents() {
+    // const dbDir = getContext(this).databaseDir;
+    const dbDir = `${getContext(this).databaseDir}/rdb`;
+    try {
+      const files = await fs.listFile(dbDir);
+      hilog.info(0x0000, 'DatabaseDir', `Contents of ${dbDir}:`);
+      files.forEach(file => {
+        hilog.info(0x0000, 'DatabaseDir', file);
+      });
+    } catch (error) {
+      hilog.error(0x0000, 'DatabaseDir', `Error listing directory: ${error.message}`);
+    }
+  }
+
+
+  backupDatabase(): void {
+    if (!this.rdbStore) {
+      throw new Error("Database not initialized");
+      hilog.info(0x001, 'DatabaseDir', 'Database not initialized')
+    }
+
+    this.rdbStore.backup('dbBackup.db', (err) => {
+      if (err) {
+        hilog.error(0x001,'DatabaseDir',`Failed to backup data. Code:${err.code},message:${err.message}`);
+        return;
+      }
+      hilog.error(0x001,'DatabaseDir','backup succeed');;
+    })
+
+  }
+
+  restoreDatabase(): void {
+    this.rdbStore.restore('dbBackup.db', (err) => {
+      if (err) {
+        hilog.error(0x001,'DatabaseDir',`Failed to restore data. Code:${err.code},message:${err.message}`);
+        return;
+      }
+      hilog.info(0x001,'DatabaseDir',`Succeeded in restoring data.`);
+    })
+  }
+
+
 }
