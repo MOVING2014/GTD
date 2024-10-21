@@ -65,7 +65,8 @@ export  struct ContextView {
           // 这里可以添加清除选择后的逻辑
         })
 
-      ForEach(Object.values(this.gtdController.projectCache), (project: ProjectModel) => {
+      // ForEach(Object.values(this.gtdController.projectCache), (project: ProjectModel) => {
+      ForEach(Object.values(this.gtdController.projectCache).sort((a, b) => a.name.localeCompare(b.name)), (project: ProjectModel) => {
         MenuItem({ content: project.name })
           .onClick(async () => {
             // this.selectedProject = project
