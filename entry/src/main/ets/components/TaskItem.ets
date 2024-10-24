@@ -269,10 +269,10 @@ aboutToAppear(){
       }
       .width('100%')
 
-      Divider()
-      .strokeWidth(0.5)
-      .width('90%')
-      .margin({top:10, bottom:10})
+      // Divider()
+      // .strokeWidth(0)
+      // .width('90%')
+      // .margin({top:10, bottom:10})
 
 
       // 添加一个按钮来控制已完成任务的显示/隐藏
@@ -290,7 +290,7 @@ aboutToAppear(){
         .onClick(() => {
           this.showCompletedTasks = !this.showCompletedTasks;
         })
-        .margin({ bottom: 10 })
+        .margin({ bottom: 10, top: 10 })
 
       if(this.showCompletedTasks) {
         List() {

@@ -18,6 +18,13 @@ export class Constants {
   static readonly deleteButtonColor: string = '#99f13030';
   static readonly editButtonColor: string = '#99305af1';
 
+  static readonly titleColorPrediction: string = '#FF3B2F';
+  static readonly titleColorInbox: string = '#6B6B99';
+
+  static readonly dateSelectedColor: string = '#4d000000';
+  static readonly dividerColor2: string = '#0d000000';
+
+
   static readonly calendarViewBackgroundIncome:  string = '#1af13030';
   static readonly calendarViewBackgroundExpense:  string = '#1a76a471';
   static readonly calendarViewBg:  string = '#08000000';
@@ -32,7 +39,7 @@ export class Constants {
 
 
   //TaskItem 相关
-  static readonly taskFontWeight: number = FontWeight.Medium;
+  static readonly taskFontWeight: number = FontWeight.Regular;
   static readonly labelMarginTop: number = 3;
   static readonly taskMarginBottom: number = 8;
 

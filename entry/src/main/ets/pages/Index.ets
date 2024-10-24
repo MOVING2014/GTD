@@ -279,11 +279,37 @@ struct Index {
           TabContent() {
             // 收集
             Column() {
+              Row(){
+                Blank()
+                Button('配置')
+                  .fontSize(Constants.fontSizeMedium)
+                  .fontWeight(FontWeight.Bold)
+                  .backgroundColor(Constants.textColorSecondary)
+                  .height(24)
+                  .onClick(() => {
+                    router.pushUrl({
+                      url: 'pages/Settings'
+                    });
+                  })
+                  .margin({right:5})
+              }
+              .width('100%')
+              .height(40)
+              .borderWidth({
+                bottom:1
+              })
+              .borderColor(Constants.dividerColor2)
+              .borderStyle(BorderStyle.Solid)
+
 
               Text("收集")
-                .fontSize(24)
+                .fontSize(32)
+                .fontColor(Constants.titleColorInbox)
                 .fontWeight(FontWeight.Medium)
-                .padding({ top: 20, bottom: 10 })
+                .width('100%')
+                .padding({ top: 8, bottom: 8, left: 16 })
+
+
 
               InboxView({
                 tasks: $tasks
@@ -302,11 +328,34 @@ struct Index {
           TabContent() {
             Column() {
 
+              Row(){
+                Blank()
+                Button('配置')
+                  .fontSize(Constants.fontSizeMedium)
+                  .fontWeight(FontWeight.Bold)
+                  .backgroundColor(Constants.textColorSecondary)
+                  .height(24)
+                  .onClick(() => {
+                    router.pushUrl({
+                      url: 'pages/Settings'
+                    });
+                  })
+                  .margin({right:5})
+              }
+              .width('100%')
+              .height(40)
+              .borderWidth({
+                bottom:1
+              })
+              .borderColor(Constants.dividerColor2)
+              .borderStyle(BorderStyle.Solid)
+
 
               Text("预测")
-                .fontSize(24)
+                .fontSize(32)
+                .fontColor(Constants.titleColorPrediction)
                 .fontWeight(FontWeight.Medium)
-                .padding({ top: 20, bottom: 10 })
+                .padding({ top: 8, bottom: 8, left: 16 })
 
               WeekView({
                 tasks: $tasks,

@@ -1,5 +1,6 @@
 // WeekView.ets
 import hilog from '@ohos.hilog';
+import { Constants } from '../common/Constants';
 import { isSameDay, parseDate, stringToDate } from '../common/utils';
 import { TaskModel } from '../models/IModels';
 
@@ -114,63 +115,78 @@ export struct WeekView {
 
 
   build() {
-    Row() {
-      ForEach(this.recentDays, (day, index) => {
-        Column() {
-          Row() {
-            Text(this.isToday(day) ? '今天' : (this.isYesterday(day)?  '过去' : this.isFuture(day)?  '未来' : this.formatDayOfWeek(day)) )
-              .fontSize(10)
-              .fontColor(this.isToday(day) ? '#b9990000' : '#666666')
-              .fontWeight(FontWeight.Bold)
-              .margin({right:3})
 
-            Text(day.getDate().toString())
-              .fontSize(12)
+    Column() {
+      Row() {
+        ForEach(this.recentDays, (day, index) => {
+          Column() {
+            Row() {
+              Text(this.isToday(day) ? '今天' : (this.isYesterday(day) ? '过去' : this.isFuture(day) ? '未来' : this.formatDayOfWeek(day)))
+                .fontSize(12)
+                .fontColor(this.isToday(day) ? '#b9990000' : '#666666')
+                .fontWeight(FontWeight.Bold)
+              // .margin({right:3})
+
+              Text(day.getDate().toString())
+                .fontSize(12)
+                .fontWeight(FontWeight.Bold)
+                .fontColor(this.isToday(day) ? '#666666' : '#666666')
+
+            }.margin({ top: 6 })
+            // .width('100%')
+            .justifyContent(FlexAlign.Center)
+
+            Blank()
+
+            Text(this.getUncompletedTaskCount(day).toString())
+              .fontSize(16)
               .fontWeight(FontWeight.Bold)
               .fontColor(this.isToday(day) ? '#666666' : '#666666')
-
-          }.margin({top:10})
-          .width('70%')
-          .justifyContent(FlexAlign.SpaceAround)
-
-          Blank()
-
-          Text(this.getUncompletedTaskCount(day).toString())
-            .fontSize(14)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(this.isToday(day) ? '#666666' : '#666666')
-            .margin({ bottom: 10 })
-        }
-        .width(50)
-        .height(60)
-        .margin({ right: 5 })
-        .borderRadius(8)
-        .backgroundColor(this.isSelected(day) ? '#79007aff' :
-          this.isToday(day) ? '#1dff003b' : '#F0F0F0')
-        .justifyContent(FlexAlign.Center)
-        .onClick(() => {
-
-          if (this.isSelected(day)) {
-            // 如果点击的是已选中的日期，则取消选中
-            this.selectedDateString = '';
-            this.onDateSelect('');
-          } else {
-            // 否则选中新的日期
-            this.selectedDateString = day.toString();
-            hilog.debug(0x002,'Calendar',`${this.selectedDateString}`)
-            this.onDateSelect(day);
+              .margin({ bottom: 6 })
           }
-          // this.selectedDateString = day.toString()
-          this.updateTrigger++
-          // this.onDateSelect(day); // 需要触发任务的过滤动作
-        })
-      },
-        day => `${day} - ${this.updateTrigger}`
-      )
+          .width(54)
+          .height(56)
+          // .margin({ right: 5 })
+          .backgroundColor(this.isSelected(day) ? '#57cecccc' :
+            this.isToday(day) ? '#FFFFFF' : '#FFFFFF')
+          .justifyContent(FlexAlign.Center)
+          .borderWidth({
+            top: this.isSelected(day) ? 2.5 : 0
+          })
+          .borderColor(Constants.dateSelectedColor)
+          .borderStyle(BorderStyle.Solid)
+          .onClick(() => {
+
+            if (this.isSelected(day)) {
+              // 如果点击的是已选中的日期，则取消选中
+              this.selectedDateString = '';
+              this.onDateSelect('');
+            } else {
+              // 否则选中新的日期
+              this.selectedDateString = day.toString();
+              hilog.debug(0x002, 'Calendar', `${this.selectedDateString}`)
+              this.onDateSelect(day);
+            }
+            // this.selectedDateString = day.toString()
+            this.updateTrigger++
+            // this.onDateSelect(day); // 需要触发任务的过滤动作
+          })
+        },
+          day => `${day} - ${this.updateTrigger}`
+        )
+      }
+      .width('100%')
+      .justifyContent(FlexAlign.Center)
+      .borderWidth({
+        bottom:1
+      })
+      .borderColor(Constants.dividerColor2)
+      .borderStyle(BorderStyle.Solid)
+
     }
     .width('100%')
-    .justifyContent(FlexAlign.SpaceBetween)
+    .padding({ left: 4, right: 4, top: 0, bottom:8 })
 
-    .padding({ left: 5, right: 5, top: 10, bottom: 10 })
+
   }
 }
