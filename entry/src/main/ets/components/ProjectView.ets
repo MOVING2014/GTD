@@ -301,7 +301,7 @@ export  struct ProjectView {
         Text(project.name)
           .fontSize(20)
           .fontWeight(FontWeight.Medium)
-          .fontColor(Color.Gray)
+          .fontColor(project.isExpended? Color.Black : Color.Gray)
         Blank()
         Image(project.isExpended ? '/common/images/icon_down.svg' : '/common/images/icon_right.svg')
           .width(16)
@@ -314,7 +314,7 @@ export  struct ProjectView {
       .width('100%')
       // .height(50)
       .backgroundColor(Color.White)
-      .padding({ left: 8, right: 16 })
+      .padding({ left: 8, right: 16 ,top: 8})
       .onClick(async () => {
         project.isExpended = !project.isExpended
         await this.gtdController.updateProject(project)
@@ -385,7 +385,7 @@ export  struct ProjectView {
 
                   })
               }
-              .margin({left:8})
+              .margin({left:8, top:4, bottom:4})
               .swipeAction({ end: this.itemEnd(this.gtdController.taskCache[taskId]),
                 start: this.itemStart(this.gtdController.taskCache[taskId])
               })

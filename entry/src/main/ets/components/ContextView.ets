@@ -282,19 +282,19 @@ export  struct ContextView {
   @Builder contextItem(context: ContextModel) {
     Column() {
       Row() {
-        Text(context.isExpended ? '📂' : '📁')  // 文件夹emoji
-          .fontSize(24)
-          .margin({ right: 10 })
         Text(context.name)
           .fontSize(20)
           .fontWeight(FontWeight.Medium)
-          .fontColor(Color.Gray)
+          .fontColor(context.isExpended? Color.Black : Color.Gray)
         Blank()
+        Image(context.isExpended ? '/common/images/icon_down.svg' : '/common/images/icon_right.svg')
+          .width(16)
+          .height(16)
 
       }
       .width('100%')
       .backgroundColor(Color.White)
-      .padding({ left: 0, right: 16 })
+      .padding({ left: 8, right: 16,top:8 })
       .onClick(async () => {
         context.isExpended = !context.isExpended
         await this.gtdController.updateContext(context)
@@ -311,7 +311,7 @@ export  struct ContextView {
             .fontSize(16)
             .fontWeight(FontWeight.Regular)
             .fontColor(Color.Grey)
-            .margin({left:40, bottom:10})
+            .padding({ left: 8, right: 16 })
             .onClick(async () => {
               context.isExpended = !context.isExpended
               await this.gtdController.updateContext(context)
@@ -326,15 +326,22 @@ export  struct ContextView {
         } .width('100%')
       }
 
+      Divider()
+        .strokeWidth(Constants.dividerWidth)
+        .width('95%')
+        .color(Constants.dividerColor)
+        .margin({bottom:Constants.taskMarginBottom, top: Constants.taskMarginTop})
+
+
       if (context.isExpended) {
         if (this.gtdController.contextIDTaskIDMap2Array[context.id]) {
-          if(context.isExpended){
-            Divider()
-              .strokeWidth(Constants.dividerWidth)
-              .width('95%')
-              .color(Constants.dividerColor)
-              .margin({bottom:Constants.taskMarginBottom})
-          }
+          // if(context.isExpended){
+          //   Divider()
+          //     .strokeWidth(Constants.dividerWidth)
+          //     .width('95%')
+          //     .color(Constants.dividerColor)
+          //     .margin({bottom:Constants.taskMarginBottom})
+          // }
 
           List() {
             ForEach(this.gtdController.contextIDTaskIDMap2Array[context.id].filter(
@@ -360,6 +367,7 @@ export  struct ContextView {
 
                   })
               }
+              .margin({left:8, top:4, bottom:4})
               .swipeAction({ end: this.itemEnd(this.gtdController.taskCache[taskId]),
               start: this.itemStart(this.gtdController.taskCache[taskId])})
             },   taskId => `${taskId}-${this.gtdController.taskCache[taskId].isCompleted}-${this.taskUpdateTrigger}`
