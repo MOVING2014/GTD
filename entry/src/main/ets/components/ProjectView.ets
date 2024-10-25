@@ -303,9 +303,12 @@ export  struct ProjectView {
           .fontWeight(FontWeight.Medium)
           .fontColor(Color.Gray)
         Blank()
-        Text(project.isExpended ? '📂' : '📁')  // 文件夹emoji
-          .fontSize(16)
-          .margin({ right: 10 })
+        Image(project.isExpended ? '/common/images/icon_down.svg' : '/common/images/icon_right.svg')
+          .width(16)
+          .height(16)
+        // Text(project.isExpended ? '📂' : '📁')  // 文件夹emoji
+        //   .fontSize(16)
+        //   .margin({ right: 10 })
 
       }
       .width('100%')
@@ -328,7 +331,7 @@ export  struct ProjectView {
             .fontSize(16)
             .fontWeight(FontWeight.Regular)
             .fontColor(Color.Grey)
-            .margin({ bottom:10})
+            // .margin({ bottom:10})
           Blank()
 
         } .width('100%')
@@ -345,15 +348,21 @@ export  struct ProjectView {
 
       }
 
+      Divider()
+        .strokeWidth(Constants.dividerWidth)
+        .width('95%')
+        .color(Constants.dividerColor)
+        .margin({bottom:Constants.taskMarginBottom, top: Constants.taskMarginTop})
+
       if (project.isExpended) {
         if (project.taskIds) {
-          if(project.isExpended){
-            Divider()
-              .strokeWidth(Constants.dividerWidth)
-              .width('95%')
-              .color(Constants.dividerColor)
-              .margin({bottom:Constants.taskMarginBottom})
-          }
+          // if(project.isExpended){
+          //   Divider()
+          //     .strokeWidth(Constants.dividerWidth)
+          //     .width('95%')
+          //     .color(Constants.dividerColor)
+          //     .margin({bottom:Constants.taskMarginBottom})
+          // }
           List() {
             ForEach(project.taskIds.filter(
               taskID => !this.gtdController.taskCache[taskID].isCompleted
@@ -376,6 +385,7 @@ export  struct ProjectView {
 
                   })
               }
+              .margin({left:8})
               .swipeAction({ end: this.itemEnd(this.gtdController.taskCache[taskId]),
                 start: this.itemStart(this.gtdController.taskCache[taskId])
               })
