@@ -297,20 +297,21 @@ export  struct ProjectView {
   @Builder ProjectItem(project: ProjectModel) {
     Column() {
       Row() {
-        Text(project.isExpended ? '📂' : '📁')  // 文件夹emoji
-          .fontSize(24)
-          .margin({ right: 10 })
+
         Text(project.name)
           .fontSize(20)
           .fontWeight(FontWeight.Medium)
           .fontColor(Color.Gray)
         Blank()
+        Text(project.isExpended ? '📂' : '📁')  // 文件夹emoji
+          .fontSize(16)
+          .margin({ right: 10 })
 
       }
       .width('100%')
       // .height(50)
       .backgroundColor(Color.White)
-      .padding({ left: 0, right: 16 })
+      .padding({ left: 8, right: 16 })
       .onClick(async () => {
         project.isExpended = !project.isExpended
         await this.gtdController.updateProject(project)
@@ -327,10 +328,11 @@ export  struct ProjectView {
             .fontSize(16)
             .fontWeight(FontWeight.Regular)
             .fontColor(Color.Grey)
-            .margin({left:40, bottom:10})
+            .margin({ bottom:10})
           Blank()
 
         } .width('100%')
+        .padding({ left: 8, right: 16 })
         .onClick(async () => {
           project.isExpended = !project.isExpended
           await this.gtdController.updateProject(project)

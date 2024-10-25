@@ -20,6 +20,8 @@ export class Constants {
 
   static readonly titleColorPrediction: string = '#FF3B2F';
   static readonly titleColorInbox: string = '#6B6B99';
+  static readonly titleColorStarred: string = '#FF9500';
+  static readonly titleColorContext: string = '#903FDE';
 
   static readonly dateSelectedColor: string = '#4d000000';
   static readonly dividerColor2: string = '#0d000000';

@@ -380,21 +380,15 @@ struct Index {
           TabContent() {
             // 项目页面内容
             Column() {
-              Row() {
-                Text('项目')
-                  .fontSize(24)
-                  .fontWeight(FontWeight.Bold)
-                  .margin({ left: 16 })
-
-                Blank() // 用于将按钮推到右边
-
-                Button({ type: ButtonType.Circle, stateEffect: true }) {
-                  Text('+++')
-                    .width(24)
-                    .height(24)
+              Row(){
+                Blank()
+                Button({ type: ButtonType.Capsule, stateEffect: true }) {
+                  Text('++')
+                    // .width(24)
+                    // .height(24)
                 }
                 .width(40)
-                .height(40)
+                .height(24)
                 .margin({ right: 16 })
                 .onClick(() => {
                   this.isAddingProject = true
@@ -404,21 +398,29 @@ struct Index {
                   .fontSize(Constants.fontSizeMedium)
                   .fontWeight(FontWeight.Bold)
                   .backgroundColor(Constants.textColorSecondary)
-                  .height(30)
+                  .height(24)
                   .onClick(() => {
                     router.pushUrl({
                       url: 'pages/Settings'
                     });
                   })
                   .margin({right:5})
-
-
-
               }
               .width('100%')
-              .height(60)
-              .backgroundColor('#F5F5F5')
-              .padding({ left: 16, right: 16 })
+              .height(40)
+              .borderWidth({
+                bottom:1
+              })
+              .borderColor(Constants.dividerColor2)
+              .borderStyle(BorderStyle.Solid)
+
+
+              Text("项目")
+                .fontSize(32)
+                .fontColor(Constants.titleColorInbox)
+                .fontWeight(FontWeight.Medium)
+                .width('100%')
+                .padding({ top: 8, bottom: 8, left: 16 })
 
               if (this.isAddingProject) {
                 NewProjectForm({
@@ -451,14 +453,6 @@ struct Index {
                 })
               }
 
-
-
-
-
-
-
-
-
             }
             .width('95%')
             .layoutWeight(1)
@@ -470,30 +464,75 @@ struct Index {
           TabContent() {
             // Context页面内容
             Column() {
-              Row() {
-                Text('场景')
-                  .fontSize(24)
-                  .fontWeight(FontWeight.Bold)
-                  .margin({ left: 16 })
 
-                Blank() // 用于将按钮推到右边
+              Row(){
+                Blank()
+                Button({ type: ButtonType.Capsule, stateEffect: true }) {
+                  Text('++')
 
-                Button({ type: ButtonType.Circle, stateEffect: true }) {
-                  Text('+++')
-                    .width(24)
-                    .height(24)
                 }
                 .width(40)
-                .height(40)
+                .height(24)
                 .margin({ right: 16 })
                 .onClick(() => {
                   this.isAddingContext = true
                 })
+
+                Button('配置')
+                  .fontSize(Constants.fontSizeMedium)
+                  .fontWeight(FontWeight.Bold)
+                  .backgroundColor(Constants.textColorSecondary)
+                  .height(24)
+                  .onClick(() => {
+                    router.pushUrl({
+                      url: 'pages/Settings'
+                    });
+                  })
+                  .margin({right:5})
               }
               .width('100%')
-              .height(60)
-              .backgroundColor('#F5F5F5')
-              .padding({ left: 16, right: 16 })
+              .height(40)
+              .borderWidth({
+                bottom:1
+              })
+              .borderColor(Constants.dividerColor2)
+              .borderStyle(BorderStyle.Solid)
+
+
+              Text("场景")
+                .fontSize(32)
+                .fontColor(Constants.titleColorContext)
+                .fontWeight(FontWeight.Medium)
+                .width('100%')
+                .padding({ top: 8, bottom: 8, left: 16 })
+
+
+
+              //
+              // Row() {
+              //   Text('场景')
+              //     .fontSize(24)
+              //     .fontWeight(FontWeight.Bold)
+              //     .margin({ left: 16 })
+              //
+              //   Blank() // 用于将按钮推到右边
+              //
+              //   Button({ type: ButtonType.Circle, stateEffect: true }) {
+              //     Text('+++')
+              //       .width(24)
+              //       .height(24)
+              //   }
+              //   .width(40)
+              //   .height(40)
+              //   .margin({ right: 16 })
+              //   .onClick(() => {
+              //     this.isAddingContext = true
+              //   })
+              // }
+              // .width('100%')
+              // .height(60)
+              // .backgroundColor('#F5F5F5')
+              // .padding({ left: 16, right: 16 })
 
               if(this.isAddingContext) {
 
@@ -546,10 +585,35 @@ struct Index {
             // Flagged页面内容
             Column() {
 
-              Text("星标")
-                .fontSize(24)
+              Row(){
+                Blank()
+                Button('配置')
+                  .fontSize(Constants.fontSizeMedium)
+                  .fontWeight(FontWeight.Bold)
+                  .backgroundColor(Constants.textColorSecondary)
+                  .height(24)
+                  .onClick(() => {
+                    router.pushUrl({
+                      url: 'pages/Settings'
+                    });
+                  })
+                  .margin({right:5})
+              }
+              .width('100%')
+              .height(40)
+              .borderWidth({
+                bottom:1
+              })
+              .borderColor(Constants.dividerColor2)
+              .borderStyle(BorderStyle.Solid)
+
+
+              Text("已标注")
+                .fontSize(32)
+                .fontColor(Constants.titleColorStarred)
                 .fontWeight(FontWeight.Medium)
-                .padding({ top: 20, bottom: 10 })
+                .width('100%')
+                .padding({ top: 8, bottom: 8, left: 16 })
 
               FlaggedItem({
                 tasks: $tasks
